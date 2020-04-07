@@ -1,6 +1,5 @@
 # DAFx2020 (SoeSe 2020)
-Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale Signalverarbeitung an der Jade Hochschule für die Kurse
-Hörtechnik und Audiologie (DAFx) und Assistive Technologien (DSP)
+Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale Signalverarbeitung an der Jade Hochschule für die Studiengänge Hörtechnik und Audiologie (DAFx) und Assistive Technologien (DSP)
 
 ## Ziele
 * Rauschen und Wellenformen als Signalquellen 
