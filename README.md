@@ -1,5 +1,5 @@
 # DAFx2020 (SoeSe 2020)
-Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale Signalverarbeitung an der Jade Hochschule für die Studiengänge Hörtechnik und Audiologie (DAFx) und Assistive Technologien (DSP)
+Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale Signalverarbeitung an der [Jade Hochschule](https://www.jade-hs.de/) für die Studiengänge [Hörtechnik und Audiologie](https://www.jade-hs.de/tgm/studium/ha/) (DAFx) und [Assistive Technologien](https://www.jade-hs.de/tgm/studium/at/) (DSP) 
 
 ## Ziele
 * Rauschen und Wellenformen als Signalquellen 
@@ -12,8 +12,8 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 ## Programmiersprachen und Bibliotheken
 * C++
-* Juce (https://juce.com/) als Framework (Support von Plug-In Schnittstellen und Stand-Alone Entwicklungen von Audio-Software)
-* Eigen (http://eigen.tuxfamily.org/) als Matrix und Lineare Algebra Lösung (Benötigt für bestimmte Filterdesign Lösungen)
+* [Juce](https://juce.com/) als Framework (Support von Plug-In Schnittstellen und Stand-Alone Entwicklungen von Audio-Software)
+* [Eigen](http://eigen.tuxfamily.org/) als Matrix und Lineare Algebra Lösung (Benötigt für bestimmte Filterdesign Lösungen)
 
 ## Bisher entwickelte Werkzeuge
 * Noise Generator (White Noise mit veränderlicher Amplitudenverteilung (gleich bis super-gaussian ==> von weich über rauh zu cracklig))
