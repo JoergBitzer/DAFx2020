@@ -8,25 +8,26 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * Aufbau von subtraktiven Synthesizern 
 * GUI Programmierung 
 * Probleme und Lösungen für "semi-professionelle" Plug-Ins (z.B. Vermeidung von Zipper-Noise, Parameterhandling, Presets, Portabilität)
-* Finden und Umsetzen von kreativen Ideen. (Was kann man wie anders machen als alle anderen da draußen und wann sollte man es genau so machen wie alle anderen.) 
+* Finden und Umsetzen von kreativen Ideen. (Was kann man wie anders machen als alle anderen da draußen. Wann sollte man es genau so machen wie alle anderen.) 
 
 ## Programmiersprachen und Bibliotheken
 * C++
-* Juce als Framework (Support von Plug-In Schnittstellen und Stand-Alone Entwicklungen von Audio-Software)
-* Eigen als Matrix und Lineare Algebra Lösung (Benötigt für bestimmte Filterdesign Lösungen)
+* Juce (https://juce.com/) als Framework (Support von Plug-In Schnittstellen und Stand-Alone Entwicklungen von Audio-Software)
+* Eigen (http://eigen.tuxfamily.org/) als Matrix und Lineare Algebra Lösung (Benötigt für bestimmte Filterdesign Lösungen)
 
 ## Bisher entwickelte Werkzeuge
 * Noise Generator (White Noise mit veränderlicher Amplitudenverteilung (gleich bis super-gaussian ==> von weich über rauh zu cracklig))
-* LFO (Sin, Rect, Saw, S&H mit Slope-Time) (Einfach erweiterbar)
+* LFO (Sin, Rect, Saw, S&H mit Slope-Time + viele neue Formen) (Einfach erweiterbar und erweitert durch Studierende) 
 * Envelope (Delay, Attack, Hold, Decay, Sustain, Release)
 * Färbungsfilter (TP, HP) mit einstellbarer Ordnung (auch als fractional, z. B. 0.5 um rosa Rauschen zu erzeugen)
 
 ## ToDo (nach Priorität sortiert)
 * Oszillatoren
-* GUI (Look and Feel, eigene GUI Elemente)
-* VCF nachbauten (inspiriert von Will Pirkle)
+* GUI (Look and Feel, eigene GUI Elemente, Zeichnen von Funktionen)
+* Preset Handling
+* VCF nachbauen (inspiriert von Will Pirkle)
 * Formant Filter (mal in richtig)
-* Effekte (Chorus, Delay, Distotion)
+* Effekte (Chorus, Delay, Distortion)
 * Modulationsmatrix
 
 Achtung: Work in Progress. 
