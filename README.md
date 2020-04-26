@@ -1,4 +1,4 @@
-# DAFx2020 (SoeSe 2020)
+# DAFx2020 (SoSe 2020)
 
 Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale Signalverarbeitung an der [Jade Hochschule](https://www.jade-hs.de/) für die Studiengänge [Hörtechnik und Audiologie](https://www.jade-hs.de/tgm/studium/ha/) (DAFx) und [Assistive Technologien](https://www.jade-hs.de/tgm/studium/at/) (DSP)
 
@@ -10,7 +10,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * Aufbau von subtraktiven Synthesizern
 * GUI Programmierung
 * Probleme und Lösungen für "semi-professionelle" Plug-Ins (z.B. Vermeidung von Zipper-Noise, Parameterhandling, Presets, Portabilität)
-* Finden und Umsetzen von kreativen Ideen. (Was kann man wie anders machen als alle anderen da draußen. Wann sollte man es genau so machen wie alle anderen.)
+* Finden und Umsetzen von kreativen Ideen. (Was kann man wie anders machen als alle Anderen da draußen. Wann sollte man es genau so machen, wie die restliche Welt.)
 
 ## Programmiersprachen und Bibliotheken
 
