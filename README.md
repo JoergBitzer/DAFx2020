@@ -20,9 +20,16 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * LFO (Sin, Rect, Saw, S&H mit Slope-Time + viele neue Formen) (Einfach erweiterbar und erweitert durch Studierende) 
 * Envelope (Delay, Attack, Hold, Decay, Sustain, Release)
 * Färbungsfilter (TP, HP) mit einstellbarer Ordnung (auch als fractional, z. B. 0.5 um rosa Rauschen zu erzeugen)
+* Oszillatoren (Aliasing freie Wavetables mit beliebiger Wellenform der Länge 512)
+
+## Synthesizer in JUCE
+* TBD
+
+## Plugins in JUCE
+* GUI Basics (Slider, Combo, Button) in JUCE
 
 ## ToDo (nach Priorität sortiert)
-* Oszillatoren
+* Synthesizer Handling in JUCE
 * GUI (Look and Feel, eigene GUI Elemente, Zeichnen von Funktionen)
 * Preset Handling
 * VCF nachbauen (inspiriert von Will Pirkle)
