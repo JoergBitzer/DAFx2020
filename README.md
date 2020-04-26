@@ -30,7 +30,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 * TBD
 
-## Plugins in JUCE
+## Effekt Plugins in JUCE
 
 * GUI Basics (Slider, Combo, Button) in JUCE (nur im Editor die Hintergrundfarbe ändern mit diesen drei Elementen)
 * Filtarbor (Filter with arbitrary order).  Ein einfaches Filter (Tief und Hochpass) mit frei wählbarer Ordnung, so dass zB rosa Rauschen erzeugt werden kann (order = 0.5 und Eingang weiß).  
