@@ -7,7 +7,7 @@ author: Martin Berdau
 -----------------------------------------------------------------------------------------*/
 
 // Aufgabe: Erweiterung auf Extended ADSR
-// Delay und Hold als Phasen einbauen. -> Angaben in Zeit -> Samples z‰hlen
+// Delay und Hold als Phasen einbauen. -> Angaben in Zeit -> Samples z√§hlen
 
 #pragma once
 
