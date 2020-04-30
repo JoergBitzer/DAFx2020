@@ -28,16 +28,17 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 ## Synthesizer in JUCE
 
-* TBD
+* nano (1 Oscillator, 1 Envelope): Demonstriert das Stimmenhandling von JUVE in der Synthesizerklasse. Grundgerüst für weitere Synth. Keine GUI, keine Parameter
+* 
 
 ## Effekt Plugins in JUCE
 
 * GUI Basics (Slider, Combo, Button) in JUCE (nur im Editor die Hintergrundfarbe ändern mit diesen drei Elementen)
 * Filtarbor (Filter with arbitrary order).  Ein einfaches Filter (Tief und Hochpass) mit frei wählbarer Ordnung, so dass zB rosa Rauschen erzeugt werden kann (order = 0.5 und Eingang weiß).  
+* Filtarbor mit GUI im Jade Stil. Nutzung von LookAndFeel 
 
 ## ToDo (nach Priorität sortiert)
 
-* Synthesizer Handling in JUCE
 * GUI (Look and Feel, eigene GUI Elemente, Zeichnen von Funktionen)
 * Preset Handling
 * VCF nachbauen (inspiriert von [Will Pirkle](https://www.willpirkle.com/))
