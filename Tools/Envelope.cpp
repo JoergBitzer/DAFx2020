@@ -99,7 +99,7 @@ void Envelope::setSamplerate(double samplerate)
 void Envelope::setDelayTime(double del_ms)
 {
 	m_delTime_ms = del_ms;
-	m_delSamples = floor(m_delTime_ms * m_fs * 0.001 + 0.5);
+	updateTimeConstants();
 }
 
 void Envelope::setAttackRate(double att_ms)
@@ -111,7 +111,7 @@ void Envelope::setAttackRate(double att_ms)
 void Envelope::setHoldTime(double hold_ms)
 {
 	m_holdTime_ms = hold_ms;
-	m_holdSamples = floor(m_holdTime_ms * m_fs * 0.001 + 0.5);
+	updateTimeConstants();
 }
 
 void Envelope::setDecayRate(double dec_ms)
@@ -136,4 +136,7 @@ void Envelope::updateTimeConstants(void)
 	m_alphaAtt = exp(-1.0 / (m_tauAtt_ms * 0.001 * m_fs));
 	m_alphaDec = exp(-1.0 / (m_tauDec_ms * 0.001 * m_fs));
 	m_alphaRel = exp(-1.0 / (m_tauRel_ms * 0.001 * m_fs));
+	m_holdSamples = floor(m_holdTime_ms * m_fs * 0.001 + 0.5);
+	m_delSamples = floor(m_delTime_ms * m_fs * 0.001 + 0.5);
+
 }

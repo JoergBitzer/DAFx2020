@@ -10,7 +10,7 @@
 | power spectral density                                                  |
 |                                                                         |
 | Author: (c) Uwe Simmer, Fachhochschule Oldenburg / Ostfriesland /       |
-| Wilhelmshaven, Institut für Hörtechnik und Audiologie (FH OOW / IHA)    |
+| Wilhelmshaven, Institut fÃ¼r HÃ¶rtechnik und Audiologie (FH OOW / IHA)    |
 | License: see End of File                                                |
 |                                                                         |
 | Version 1.0, Date 07. Oct. 2005:  initial version                       |
