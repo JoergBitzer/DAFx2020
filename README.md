@@ -39,9 +39,9 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 ## ToDo (nach Priorität sortiert)
 
-* GUI (Look and Feel, eigene GUI Elemente, Zeichnen von Funktionen)
-* Preset Handling
+* GUI (eigene GUI Elemente, Zeichnen von Funktionen)
 * VCF nachbauen (inspiriert von [Will Pirkle](https://www.willpirkle.com/))
+* Preset Handling
 * Formant Filter (mal in richtig)
 * Effekte (Chorus, Delay, Distortion)
 * Modulationsmatrix
