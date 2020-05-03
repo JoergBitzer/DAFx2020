@@ -18,7 +18,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * [Juce](https://juce.com/) als Framework (Support von Plug-In Schnittstellen und Stand-Alone Entwicklungen von Audio-Software)
 * [Eigen](http://eigen.tuxfamily.org/) als Matrix und Lineare Algebra Lösung (Benötigt für bestimmte Filterdesign Lösungen)
 
-## Bisher entwickelte Werkzeuge
+## Bisher entwickelte Werkzeuge (Audio Processing unabhängig von JUCE)
 
 * Noise Generator (White Noise mit veränderlicher Amplitudenverteilung (gleich bis super-gaussian ==> von weich über rauh zu cracklig))
 * LFO (Sin, Rect, Saw, S&H mit Slope-Time + viele neue Formen) (Einfach erweiterbar und erweitert durch Studierende)
@@ -39,11 +39,12 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 ## ToDo (nach Priorität sortiert)
 
-* GUI (eigene GUI Elemente, Zeichnen von Funktionen)
+* GUI (eigene GUI Elemente, Zeichnen von Funktionen, eigene Mausinteraktion)
 * VCF nachbauen (inspiriert von [Will Pirkle](https://www.willpirkle.com/))
+* Oversamping für Wave-shaper (Distortion)
 * Preset Handling
 * Formant Filter (mal in richtig)
-* Effekte (Chorus, Delay, Distortion)
+* Effekte (Chorus, Delay)
 * Modulationsmatrix
 
 Achtung: Work in Progress.
