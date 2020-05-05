@@ -24,11 +24,12 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * LFO (Sin, Rect, Saw, S&H mit Slope-Time + viele neue Formen) (Einfach erweiterbar und erweitert durch Studierende)
 * Envelope (Delay, Attack, Hold, Decay, Sustain, Release)
 * Färbungsfilter (TP, HP) mit einstellbarer Ordnung (auch als fractional, z. B. 0.5 um rosa Rauschen zu erzeugen)
-* Oszillatoren (Aliasing freie Wavetables mit beliebiger Wellenform der Länge 512)
+* Oszillatoren (Aliasing freie Wavetables mit beliebiger Wellenform der Länge 512), pitchbending moeglich, glide/portamento moeglich
+* Moog Ladder filter (inspiriert von [Will Pirkle](https://www.willpirkle.com/)
 
 ## Synthesizer in JUCE
 
-* nano (1 Oscillator, 1 Envelope): Demonstriert das Stimmenhandling von JUVE in der Synthesizerklasse. Grundgerüst für weitere Synth. Keine GUI, keine Parameter
+* nano (1 Oscillator, 1 Envelope, 1 filter): Demonstriert das Stimmenhandling von JUVE in der Synthesizerklasse. Grundgerüst für weitere Synth. Keine GUI, keine Parameter
 * 
 
 ## Effekt Plugins in JUCE
@@ -40,7 +41,6 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 ## ToDo (nach Priorität sortiert)
 
 * GUI (eigene GUI Elemente, Zeichnen von Funktionen, eigene Mausinteraktion)
-* VCF nachbauen (inspiriert von [Will Pirkle](https://www.willpirkle.com/))
 * Oversamping für Wave-shaper (Distortion)
 * Preset Handling
 * Formant Filter (mal in richtig)
