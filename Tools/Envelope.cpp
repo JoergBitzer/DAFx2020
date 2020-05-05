@@ -88,6 +88,8 @@ void Envelope::NoteOn()
 void Envelope::NoteOff()
 {
 	m_envelopePhase = envelopePhases::Release;
+	if (m_envGain < 1.0e-5)
+		m_envelopePhase = envelopePhases::Off;
 }
 
 void Envelope::setSamplerate(double samplerate)
