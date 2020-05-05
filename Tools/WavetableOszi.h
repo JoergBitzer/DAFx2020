@@ -44,7 +44,8 @@ public:
 	void setWaveformXFade(double xfadefactor); /**< set a factor to mix two waveforms range 0...1*/
 	void setSecondWaveform(int waveformnumber); /**< set the second waveform*/
 	void resetPhase(); /**< reset the phase to start at the beginning of the internal waveform representation*/
-
+	void changeFrequencyRelative(double change_semitones);
+	void setPortamentoTime(double portaTime_ms);
 private:
 	double m_fs; ///< sample rate
 	double m_freq; ///< frequency
@@ -83,5 +84,9 @@ private:
 	 */
 	void copyNewWavetable(std::vector<double> newwaveform, int nrWaveform, int nrWavetable);
 	void computeIncStep(); ///< internal helper for the computation of the inc step
+	double m_incStepModifier;
+	int m_portamentoCounter;
+	int m_portamentoTime_samples;
+	double m_portamentoFactor;
 };
 

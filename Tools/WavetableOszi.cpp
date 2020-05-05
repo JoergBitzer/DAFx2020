@@ -14,7 +14,8 @@ WavetableOszi::WavetableOszi()
 	m_freq(1.0),
 	m_fft(m_lenOfWavetable),
 	m_waveformXFadeFactor(0.0),
-	m_secondWaveform(0)
+	m_secondWaveform(0),
+	m_incStepModifier(1.0)
 {
 	m_f0Table = m_fsmin / m_lenOfWavetable;
 	double maxAliasingFreeMidiNote = 108.0;
@@ -68,7 +69,13 @@ int WavetableOszi::getData(std::vector<double>& data)
 
 		data[kk] = (1.0-m_waveformXFadeFactor) * out + m_waveformXFadeFactor*out2;
 
-		m_curPos += m_incStep;
+		if (m_portamentoCounter > 0)
+		{
+			--m_portamentoCounter;
+			m_incStep *= m_portamentoFactor;
+		}
+
+		m_curPos += (m_incStep*m_incStepModifier);
 		if (m_curPos >= m_lenOfWavetable)
 			m_curPos -= m_lenOfWavetable;
 
@@ -86,7 +93,17 @@ void WavetableOszi::setSamplerate(double samplerate)
 void WavetableOszi::setFrequency(double freq)
 {
 	m_freq = freq;
-	computeIncStep();
+	if (m_portamentoTime_samples <= 0)
+	{
+		computeIncStep();
+		m_portamentoCounter = -1;
+	}
+	else
+	{
+		m_portamentoCounter = m_portamentoTime_samples;
+		double targetInc = m_freq / m_f0Table;
+		m_portamentoFactor = exp(log(targetInc / m_incStep) / m_portamentoTime_samples);
+	}
 	m_curWavetable = static_cast<int> (log(freq / m_f0Table) / log(pow(2.0, double(m_semitonespertable) / 12.0)));
 	if (m_curWavetable < 0)
 		m_curWavetable = 0 ;
@@ -117,6 +134,16 @@ void WavetableOszi::setSecondWaveform(int waveformnumber)
 void WavetableOszi::resetPhase()
 {
 	m_curPos = 0.0;
+}
+
+void WavetableOszi::changeFrequencyRelative(double change_semitones)
+{
+	m_incStepModifier = pow(2.0, change_semitones / 12.0);
+}
+
+void WavetableOszi::setPortamentoTime(double portaTime_ms)
+{
+	m_portamentoTime_samples = static_cast<int>(portaTime_ms * 0.001 * m_fs);
 }
 
 void WavetableOszi::computeFullWavetable()
