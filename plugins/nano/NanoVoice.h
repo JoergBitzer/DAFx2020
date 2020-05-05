@@ -5,6 +5,7 @@
 #include <BasicWaveforms.h>
 #include <WavetableOszi.h>
 #include <Envelope.h>
+#include "MoogLadder.h"
 
 class NanoVoice : public SynthesiserVoice
 {
@@ -76,7 +77,7 @@ public:
         int numSamples) ;
 
     void prepareVoice(double samplerate, int maxBlockLen);
-
+    void setPitchBendWidth(double newPitchBendwidth) { m_pitchbendWidth_semitones = newPitchBendwidth; };
 private:
     static const int m_wavelen = 512;
     int m_maxLen;
@@ -93,5 +94,10 @@ private:
     // Envelope;
     Envelope m_envelope;
     double m_level;
+    const int m_pitchBendMidPos = 8192;
+    double m_pitchbendWidth_semitones;
+    double m_portaTime_ms;
+
+    MoogLadder m_filter;
 };
 
