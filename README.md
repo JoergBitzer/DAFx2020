@@ -25,11 +25,11 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * Envelope (Delay, Attack, Hold, Decay, Sustain, Release)
 * Färbungsfilter (TP, HP) mit einstellbarer Ordnung (auch als fractional, z. B. 0.5 um rosa Rauschen zu erzeugen)
 * Oszillatoren (Aliasing freie Wavetables mit beliebiger Wellenform der Länge 512), pitchbending moeglich, glide/portamento moeglich
-* Moog Ladder filter (inspiriert von [Will Pirkle](https://www.willpirkle.com/)
+* Moog Ladder filter (inspiriert von [Will Pirkle](https://www.willpirkle.com/) ohne Nicht-Linearität.
 
 ## Synthesizer in JUCE
 
-* nano (1 Oscillator, 1 Envelope, 1 filter): Demonstriert das Stimmenhandling von JUVE in der Synthesizerklasse. Grundgerüst für weitere Synth. Keine GUI, keine Parameter
+* nano (1 Oscillator, 1 Envelope, 1 Filter (noch ohne Modulation)): Demonstriert das Stimmenhandling von JUCE in der Synthesizerklasse. Grundgerüst für weitere Synth. Keine GUI, keine Parameter.
 * 
 
 ## Effekt Plugins in JUCE
