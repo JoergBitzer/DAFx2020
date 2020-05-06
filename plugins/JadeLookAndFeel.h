@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 
+
 const auto JadeWhite(Colour::fromFloatRGBA(0.95, 0.95, 0.95, 1.0));
 const auto JadeRed(Colour::fromFloatRGBA(0.890196078431373, 0.023529411764706, 0.074509803921569, 1.0));
 const auto JadeTeal(Colour::fromFloatRGBA(0.352941176470588, 0.372549019607843, 0.337254901960784, 1.0));
@@ -16,7 +17,9 @@ class JadeLookAndFeel : public LookAndFeel_V4
 {
 public:
 	JadeLookAndFeel();
-private:
 
+private:
+	void drawRotarySlider(Graphics& g, int x, int y, int width, int height, float sliderPos,
+		const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider) override;
 };
 
