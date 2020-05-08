@@ -26,6 +26,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * Färbungsfilter (TP, HP) mit einstellbarer Ordnung (auch als fractional, z. B. 0.5 um rosa Rauschen zu erzeugen)
 * Oszillatoren (Aliasing freie Wavetables mit beliebiger Wellenform der Länge 512), pitchbending moeglich, glide/portamento moeglich
 * Moog Ladder filter (inspiriert von [Will Pirkle](https://www.willpirkle.com/) ohne Nicht-Linearität.
+* Erste Idee einer eignen Anzeige Komponente
 
 ## Synthesizer in JUCE
 
@@ -40,11 +41,11 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 ## ToDo (nach Priorität sortiert)
 
-* GUI (eigene GUI Elemente, Zeichnen von Funktionen, eigene Mausinteraktion)
+* GUI (eigene Mausinteraktion)
+* Effekte (Chorus, Delay)
 * Oversamping für Wave-shaper (Distortion)
 * Preset Handling
 * Formant Filter (mal in richtig)
-* Effekte (Chorus, Delay)
 * Modulationsmatrix
 
 Achtung: Work in Progress.
