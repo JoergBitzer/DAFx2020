@@ -43,7 +43,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 * GUI (eigene Mausinteraktion)
 * Effekte (Chorus, Delay)
-* First order Tiefpass (https://dsp.stackexchange.com/questions/34969/cutoff-frequency-of-a-first-order-recursive-filter und als Butterworth Filter). Hilfstool für analogeren Chorus.
+* First order Tiefpass (https://dsp.stackexchange.com/questions/34969/cutoff-frequency-of-a-first-order-recursive-filter und als Butterworth Filter). HP (approx for fc < fs/4): H(z) = K - 1z^-1 / 1 - bz^-1 b = 1-2*pi*fc/fs K = (b+1)/2 als Hilfstool für analogeren Chorus.
 * Oversamping für Wave-shaper (Distortion)
 * Preset Handling
 * Formant Filter (mal in richtig)
