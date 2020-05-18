@@ -26,7 +26,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * Färbungsfilter (TP, HP) mit einstellbarer Ordnung (auch als fractional, z. B. 0.5 um rosa Rauschen zu erzeugen)
 * Oszillatoren (Aliasing freie Wavetables mit beliebiger Wellenform der Länge 512), pitchbending moeglich, glide/portamento moeglich
 * Moog Ladder filter (inspiriert von [Will Pirkle](https://www.willpirkle.com/) ohne Nicht-Linearität.
-* Erste Idee einer eignen Anzeige Komponente
+* First order filter design and filter routine (everything in one header)
 
 ## Synthesizer in JUCE
 
@@ -39,13 +39,17 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * Filtarbor (Filter with arbitrary order).  Ein einfaches Filter (Tief und Hochpass) mit frei wählbarer Ordnung, so dass zB rosa Rauschen erzeugt werden kann (order = 0.5 und Eingang weiß).  
 * Filtarbor mit GUI im Jade Stil. Nutzung von LookAndFeel ![FiltarborMitGUI](/img/FiltarborJadeGui.jpg)
 
+## Concepts (HowTo in JUCE)
+* How to use the MidiKeyboardComponent
+* How to build your own components (display and mouse input)
+
 ## ToDo (nach Priorität sortiert)
 
-* GUI (eigene Mausinteraktion)
 * Effekte (Chorus, Delay)
-* First order Tiefpass (https://dsp.stackexchange.com/questions/34969/cutoff-frequency-of-a-first-order-recursive-filter und als Butterworth Filter). HP (approx for fc < fs/4): H(z) = K - 1z^-1 / 1 - bz^-1 b = 1-2*pi*fc/fs K = (b+1)/2 als Hilfstool für analogeren Chorus.
+* LevelMeter (GUI), Konzept des regelmäßigen GUI updates)
+* GUI (Einbinden von Images)
 * Oversamping für Wave-shaper (Distortion)
-* Preset Handling
+* Preset/Paramater Handling
 * Formant Filter (mal in richtig)
 * Modulationsmatrix
 
