@@ -27,6 +27,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * Oszillatoren (Aliasing freie Wavetables mit beliebiger Wellenform der Länge 512), pitchbending moeglich, glide/portamento moeglich
 * Moog Ladder filter (inspiriert von [Will Pirkle](https://www.willpirkle.com/) ohne Nicht-Linearität.
 * First order filter design and filter routine (everything in one header)
+* Helper Header for lowpass->lowpass / lowpass->highpass transforms and bilinear transform for first and second order filter.
 
 ## Synthesizer in JUCE
 
