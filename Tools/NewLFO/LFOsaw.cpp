@@ -36,6 +36,8 @@ void LFOsaw::setSamplingrate(double samplerate)
 
 void LFOsaw::setStartPhase(double phase)
 {
+	if (phase < 0.0)
+		phase += 2.0 * M_PI;
 	m_startPhase = phase;
 	reset();
 }

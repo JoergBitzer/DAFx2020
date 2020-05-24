@@ -22,7 +22,8 @@ LFO::LFO()
 	m_smoothcut(500.0),
 	m_startphase(0.0),
 	m_state1(0.0),
-	m_state2(0.0)
+	m_state2(0.0),
+	m_polarity(Polarity::bipolar)
 {
 	m_lfoBasis = &m_lfosin;
 	m_b.resize(3);
@@ -56,13 +57,23 @@ int LFO::getData(std::vector<double>& data)
 	{
 		
 		data[kk] *= m_invert;
-		if (data[kk] < 0.0 )
-			data[kk] = -pow(-data[kk], m_formFactor);
+		if (m_polarity == Polarity::bipolar)
+		{
+			if (data[kk] < 0.0)
+				data[kk] = -pow(-data[kk], m_formFactor);
+			else
+				data[kk] = pow(data[kk], m_formFactor);
+
+			data[kk] += 1.0;
+			data[kk] *= 0.5;
+		}
 		else
+		{
+			data[kk] += 1.0;
+			data[kk] *= 0.5;
 			data[kk] = pow(data[kk], m_formFactor);
-		
-		data[kk] += 1.0;
-		data[kk] *= 0.5;
+		}
+
 		data[kk] *= m_maxmin;
 		data[kk] += m_min;
 	}

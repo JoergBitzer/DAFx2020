@@ -29,6 +29,11 @@ public:
 		min,
 		last
 	};
+	enum class Polarity : bool
+	{
+		unipolar,
+		bipolar
+	};
 	LFO();
 	~LFO();
 
@@ -53,6 +58,10 @@ public:
 	void setSyncedPhase(bool phaseIsSynced)
 	{
 		m_lfoBasis->setSyncedPhase(phaseIsSynced);
+	};
+	void setPolarity(Polarity polarity)
+	{
+		m_polarity = polarity;
 	};
 
 protected:
@@ -92,7 +101,7 @@ protected:
 	double m_smoothcut;
 	double m_state1, m_state2;
 	std::vector<double> m_b, m_a, m_d, m_c;
-
+	Polarity m_polarity;
 
 };
 

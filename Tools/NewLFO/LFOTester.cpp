@@ -11,13 +11,13 @@ int main()
 	data.resize(30000);
 
 	LFO lfo;
-	lfo.setLFOFunction(LFO::LFOFunctions::sinus);
+	lfo.setLFOFunction(LFO::LFOFunctions::triangle);
 	lfo.setSamplerate(44100.0);
 	lfo.setFrequency(20.0);
 	lfo.setMin(-2.0);
 	lfo.setMax(2.0);
-	lfo.setFormFactor(0.001);
-	lfo.setPulseWidth(10.0);
+	lfo.setFormFactor(2.);
+	lfo.setPulseWidth(100.0);
 	lfo.setStartphase(-3.1414/2.0);
 	//lfo.invertForm();
 	lfo.setDelay(-50.0);
@@ -25,7 +25,7 @@ int main()
 	lfo.setSyncedPhase(true);
 	lfo.setSmoothing(true);
 	lfo.setEmptyCyclePos(LFO::EmptyCyclePos::zero);
-
+	lfo.setPolarity(LFO::Polarity::unipolar);
 	std::ofstream out("data.txt");
 
 	lfo.getData(data);
