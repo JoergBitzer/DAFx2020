@@ -43,15 +43,15 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 ## Concepts (HowTo in JUCE)
 * How to use the MidiKeyboardComponent
 * How to build your own components (display and mouse input)
+* LevelMeter (GUI), Konzept des regelmäßigen GUI updates)
 
 ## ToDo (nach Priorität sortiert)
 
 * Effekte (Chorus, Delay)
-* LevelMeter (GUI), Konzept des regelmäßigen GUI updates)
 * GUI (Einbinden von Images)
-* Oversamping für Wave-shaper (Distortion)
 * Preset/Paramater Handling
 * Formant Filter (mal in richtig)
+* Oversamping für Wave-shaper (Distortion)
 * Modulationsmatrix
 
 Achtung: Work in Progress.
