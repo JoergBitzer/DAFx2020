@@ -45,11 +45,11 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * How to use the MidiKeyboardComponent
 * How to build your own components (display and mouse input)
 * LevelMeter (GUI), Konzept des regelmäßigen GUI updates)
+* GUI (Einbinden von Images)
 
 ## ToDo (nach Priorität sortiert)
 
 * Effekte (Chorus, Delay)
-* GUI (Einbinden von Images)
 * LFO (Random LFO mit hoher Paramtrisierbarkeit)
 * Preset/Paramater Handling
 * Formant Filter (mal in richtig)
