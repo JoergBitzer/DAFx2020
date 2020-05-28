@@ -22,6 +22,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 * Noise Generator (White Noise mit veränderlicher Amplitudenverteilung (gleich bis super-gaussian ==> von weich über rauh zu cracklig))
 * LFO (Sin, Rect, Saw, S&H mit Slope-Time + viele neue Formen) (Einfach erweiterbar und erweitert durch Studierende)
+* LFO (Sin, Tri, Saw) mit vielen Parametern (PulseWidth, CycleLength, Phase, Smoothing, Delay, FormMorphing)
 * Envelope (Delay, Attack, Hold, Decay, Sustain, Release)
 * Färbungsfilter (TP, HP) mit einstellbarer Ordnung (auch als fractional, z. B. 0.5 um rosa Rauschen zu erzeugen)
 * Oszillatoren (Aliasing freie Wavetables mit beliebiger Wellenform der Länge 512), pitchbending moeglich, glide/portamento moeglich
@@ -49,6 +50,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 * Effekte (Chorus, Delay)
 * GUI (Einbinden von Images)
+* LFO (Random LFO mit hoher Paramtrisierbarkeit)
 * Preset/Paramater Handling
 * Formant Filter (mal in richtig)
 * Oversamping für Wave-shaper (Distortion)
