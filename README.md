@@ -46,14 +46,14 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * How to build your own components (display and mouse input)
 * LevelMeter (GUI), Konzept des regelmäßigen GUI updates)
 * GUI (Einbinden von Images)
+* PresetHandler
 
 ## ToDo (nach Priorität sortiert)
 
 * Effekte (Chorus, Delay)
-* LFO (Random LFO mit hoher Paramtrisierbarkeit)
-* Preset/Paramater Handling
 * Formant Filter (mal in richtig)
 * Oversamping für Wave-shaper (Distortion)
 * Modulationsmatrix
+* LFO (Random LFO mit hoher Paramtrisierbarkeit)
 
 Achtung: Work in Progress.
