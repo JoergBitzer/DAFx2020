@@ -12,25 +12,26 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "PoorManLevelMeter.h"
 
 //==============================================================================
 /**
 */
-class NanoAudioProcessorEditor  : public AudioProcessorEditor
+class DatenAnzeigeAudioProcessorEditor  : public AudioProcessorEditor, Timer
 {
 public:
-    NanoAudioProcessorEditor (NanoAudioProcessor&);
-    ~NanoAudioProcessorEditor();
+    DatenAnzeigeAudioProcessorEditor (DatenAnzeigeAudioProcessor&);
+    ~DatenAnzeigeAudioProcessorEditor();
 
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
-
+    void timerCallback();
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    NanoAudioProcessor& m_processor;
-    MidiKeyboardComponent m_MidiKeyboard;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NanoAudioProcessorEditor)
+    DatenAnzeigeAudioProcessor& m_processor;
+    TextButton m_textdisplay;
+    PoorManLevelMeter m_level;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DatenAnzeigeAudioProcessorEditor)
 };

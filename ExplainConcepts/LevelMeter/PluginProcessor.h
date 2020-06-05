@@ -10,25 +10,17 @@
 
 #pragma once
 
-//#include <JuceHeader.h>
-#include "../JuceLibraryCode/JuceHeader.h"
-#include "NanoSound.h"
-#include "NanoSynth.h"
-#include "NanoVoice.h"
-
-//#include "PluginEditor.h"
+#include <JuceHeader.h>
 
 //==============================================================================
 /**
 */
-
-
-class NanoAudioProcessor  : public AudioProcessor
+class DatenAnzeigeAudioProcessor  : public AudioProcessor
 {
 public:
     //==============================================================================
-    NanoAudioProcessor();
-    ~NanoAudioProcessor();
+    DatenAnzeigeAudioProcessor();
+    ~DatenAnzeigeAudioProcessor();
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -62,10 +54,10 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
-    MidiKeyboardState m_keyboardState;
+    double getRMS() { return m_rms; };
+
 private:
-    static const int kNumberOfVoices = 16;
-    NanoSynth m_synth;
+    std::atomic<double> m_rms;
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NanoAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DatenAnzeigeAudioProcessor)
 };

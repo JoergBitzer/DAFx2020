@@ -11,34 +11,42 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#define GUI_WIDTH 800
-
 //==============================================================================
-NanoAudioProcessorEditor::NanoAudioProcessorEditor (NanoAudioProcessor& p)
-    : AudioProcessorEditor (&p), m_processor (p),
-    m_MidiKeyboard(m_processor.m_keyboardState,MidiKeyboardComponent::Orientation::horizontalKeyboard)
+DatenAnzeigeAudioProcessorEditor::DatenAnzeigeAudioProcessorEditor (DatenAnzeigeAudioProcessor& p)
+    : AudioProcessorEditor (&p), m_processor (p)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (GUI_WIDTH, 300);
-    addAndMakeVisible(m_MidiKeyboard);
+    addAndMakeVisible(m_textdisplay);
+    addAndMakeVisible(m_level);
+    setSize (400, 300);
+    startTimerHz(30.0);
 }
 
-NanoAudioProcessorEditor::~NanoAudioProcessorEditor()
+DatenAnzeigeAudioProcessorEditor::~DatenAnzeigeAudioProcessorEditor()
 {
 }
 
 //==============================================================================
-void NanoAudioProcessorEditor::paint (Graphics& g)
+void DatenAnzeigeAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 
 }
 
-void NanoAudioProcessorEditor::resized()
+void DatenAnzeigeAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    m_MidiKeyboard.setBounds(0, 200, getWidth(), 100);
+    m_textdisplay.setBounds(20, 20, 120, 40);
+    m_level.setBounds(150, 20, 30, getHeight() - 20);
+}
+
+void DatenAnzeigeAudioProcessorEditor::timerCallback()
+{
+    double rms = m_processor.getRMS();
+    rms = 20.0 * log10(rms + 0.0000000001);
+    m_textdisplay.setButtonText(String(rms) + " dB");
+    m_level.setLevel(rms);
 }

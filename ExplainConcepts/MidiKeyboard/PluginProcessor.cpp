@@ -28,8 +28,7 @@ NanoAudioProcessor::NanoAudioProcessor()
     {
         m_synth.addVoice(new NanoVoice());
     }
-    m_pSound = std::make_unique<NanoSound>();
-    m_synth.addSound(*m_pSound);
+    m_synth.addSound(new NanoSound());
 
 }
 
@@ -105,7 +104,7 @@ void NanoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     m_synth.prepareToPlay(sampleRate, samplesPerBlock);
-    
+    m_keyboardState.reset();
 }
 
 void NanoAudioProcessor::releaseResources()
@@ -140,7 +139,7 @@ bool NanoAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 
 void NanoAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    m_editor->processMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
+    m_keyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     m_synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
@@ -152,8 +151,7 @@ bool NanoAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* NanoAudioProcessor::createEditor()
 {
-    m_editor = new NanoAudioProcessorEditor(*this);
-    return m_editor;
+    return new NanoAudioProcessorEditor(*this);
 }
 
 //==============================================================================
