@@ -61,3 +61,29 @@ void MoogLadder::changeParameter()
 	m_beta2 = m_alpha * m_alpha / (1.0 + g);
 	m_beta1 = m_alpha * m_alpha * m_alpha / (1.0 + g);
 }
+#ifdef JUCE
+
+int MoogLadderParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParameter>>& paramVector)
+{
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramCutoff.ID,
+		paramCutoff.name,
+		NormalisableRange<float>(paramCutoff.minValue, paramCutoff.maxValue),
+		paramCutoff.defaultValue,
+		paramCutoff.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { value = int(exp(value) * 10)*0.1;  return String(value, MaxLen); },
+		[](const String& text) {return text.getFloatValue(); }));
+	
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramResonance.ID,
+		paramResonance.name,
+		NormalisableRange<float>(paramResonance.minValue, paramResonance.maxValue),
+		paramResonance.defaultValue,
+		paramResonance.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) {return String(value, MaxLen); },
+		[](const String& text)	{ return text.getFloatValue();}));
+	
+	
+	return 0;
+}
+#endif

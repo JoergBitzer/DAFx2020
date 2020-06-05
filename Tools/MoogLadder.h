@@ -3,6 +3,7 @@
 #include <cmath>
 #include <vector>
 
+
 class MoogLadder
 {
 public:
@@ -28,3 +29,34 @@ private:
 	void changeParameter();
 };
 
+#ifdef JUCE
+#include <JuceHeader.h>
+const struct
+{
+	std::string ID = "cutoff";
+	std::string name = "Cutoff";
+	std::string unitName = "Hz";
+	float minValue = log(30.f);
+	float maxValue = log(15000.f);
+	float defaultValue = log(13000.f);
+}paramCutoff;
+
+const struct
+{
+	std::string ID = "resonance";
+	std::string name = "Resonance";
+	std::string unitName = "";
+	float minValue = 0.0f;
+	float maxValue = 3.99f;
+	float defaultValue = 2.f;
+}paramResonance;
+
+class MoogLadderParameter
+{
+public:
+	// Lowpass
+
+	int addParameter(std::vector < std::unique_ptr<RangedAudioParameter>>& paramVector);
+};
+
+#endif
