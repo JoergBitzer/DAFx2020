@@ -39,14 +39,13 @@ NanoAudioProcessor::NanoAudioProcessor()
 
 	m_parameterVTS = std::make_unique<AudioProcessorValueTreeState>(*this, nullptr, Identifier("NanoVTS"),
 		AudioProcessorValueTreeState::ParameterLayout(m_paramVector.begin(), m_paramVector.end()));
-
-	m_presets.setAudioValueTreeState(m_parameterVTS.get());
-	m_presets.loadAllUserPresets();
-
+	m_parameterVTS->state.setProperty("version", JucePlugin_VersionString, nullptr);
 
 	m_sound->m_cutoff = m_parameterVTS->getRawParameterValue(paramCutoff.ID);
 	m_sound->m_reso = m_parameterVTS->getRawParameterValue(paramResonance.ID);
-	m_parameterVTS->state.setProperty("version", JucePlugin_VersionString, nullptr);
+
+	m_presets.setAudioValueTreeState(m_parameterVTS.get());
+	m_presets.loadAllUserPresets();
 }
 
 NanoAudioProcessor::~NanoAudioProcessor()

@@ -163,12 +163,16 @@ int PresetHandler::loadAllUserPresets()
 {
 	File outfiledir = getUserPresetsFolder();
 	auto files = outfiledir.findChildFiles(File::findFiles, true, "*.xml");
+	if (files.isEmpty() == true)
+	{
+		addOrChangeCurrentPreset("Init","Unknown");
+	}
 	for (auto kk : files)
 	{
 		auto vt = loadPreset(kk.getFileNameWithoutExtension());
 		addPreset(vt);
 	}
-	return 0;
+	return files.size();
 }
 
 int PresetHandler::getAllKeys(std::vector<String>& keys)
@@ -206,7 +210,7 @@ PresetComponent::PresetComponent(PresetHandler& ph)
 		m_presetCombo.addItem(cat, ++id);
 
 	m_presetCombo.onChange = [this]() {itemchanged(); };
-	m_presetCombo.setSelectedItemIndex(2, false);
+	m_presetCombo.setSelectedItemIndex(0, false);
 	m_presetCombo.isTextEditable();
 	m_presetCombo.setEditableText(true);
 
