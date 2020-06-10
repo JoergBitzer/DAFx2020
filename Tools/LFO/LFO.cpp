@@ -7,9 +7,11 @@ LFO::LFO()
 	m_min(1.0),
 	m_mean(0.0),
 	m_amplitude(1.0),
-	m_maxmin(2.0)
+	m_maxmin(2.0),
+	m_startphase(0.0),
+	m_slopeTime(0.0)
 {
-	m_lfoBasis = &m_lfosin;
+	m_lfoBasis = &m_lfotri;
 }
 
 LFO::~LFO()
@@ -93,6 +95,9 @@ void LFO::setLFOFunction(LFOFunctions newFunc)
 		break;
 	case LFOFunctions::rect:
 		m_lfoBasis = &m_lforect;
+		break;
+	case LFOFunctions::tri:
+		m_lfoBasis = &m_lfotri;
 		break;
 	case LFOFunctions::sampleAndHold:
 		m_lfoBasis = &m_sampleandhold;

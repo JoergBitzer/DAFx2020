@@ -3,6 +3,7 @@
 #include "ILFO.h"
 #include "LFOsin.h"
 #include "LFOrect.h"
+#include "LFOtriangle.h"
 #include "LFOsampleAndHold.h"
 
 class LFO
@@ -12,6 +13,7 @@ public:
 	{
 		sinus,
 		rect,
+		tri,
 		sampleAndHold,
 		nroflfofunctions
 	};
@@ -33,6 +35,7 @@ protected:
 	ILFO* m_lfoBasis;
 	LFOsin	m_lfosin;
 	LFOrect m_lforect;
+	LFOtriangle m_lfotri;
 	LFOsampleAndHold m_sampleandhold;
 	double m_max;
 	double m_min;
