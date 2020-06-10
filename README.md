@@ -32,7 +32,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 ## Synthesizer in JUCE
 
-* nano (1 Oscillator, 1 Envelope, 1 Filter (noch ohne Modulation)): Demonstriert das Stimmenhandling von JUCE in der Synthesizerklasse. Grundgerüst für weitere Synth. Keine GUI, keine Parameter.
+* nano (1 Oscillator, 1 Envelope, 1 Filter (noch ohne Modulation)): Demonstriert das Stimmenhandling von JUCE in der Synthesizerklasse. Grundgerüst für weitere Synth. Bisher nur 2 Parameter (cutoff und Resonance mit Slidern (Erläuterung Konzept Parameter)) 
 * 
 
 ## Effekt Plugins in JUCE
@@ -59,3 +59,10 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * Oversamping für Wave-shaper (Distortion)
 
 Achtung: Work in Progress.
+
+### issues
+
+* Filterübergänge mit den Wechsel pro Block zu sprunghaft.==> Entweder AUdioblock in kleine Blöcke zerlegen (feste interne updaterate zb 100Hz)  oder Audiosmoothing im Filter (zwei Filter und blenden)
+* oscxFade (und alles was über die Voices stabil sein muss) müssen parameter sein und in Sound gespeichert werden, da sonst die Stimmen bei gleichem Anschlag unterschiedlich klingen
+* Envelope knackt (bei schnellen Einstellungen 1ms Attackzeit) (Über Smoothing mit Besselfilter nachdenken (siehe LFO), beim Osc nachsehen, ob im Nulldurchgang  oder im Maximum gestartet wird (auch überlegen, ob osc nicht mit freier Phase analoger ist))
+
