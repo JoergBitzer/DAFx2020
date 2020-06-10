@@ -21,7 +21,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 ## Bisher entwickelte Werkzeuge (Audio Processing unabhängig von JUCE)
 
 * Noise Generator (White Noise mit veränderlicher Amplitudenverteilung (gleich bis super-gaussian ==> von weich über rauh zu cracklig))
-* LFO (Sin, Rect, Saw, S&H mit Slope-Time + viele neue Formen) (Einfach erweiterbar und erweitert durch Studierende)
+* LFO (Sin, Rect, Saw, Tri und S&H mit Slope-Time + viele neue Formen) (Einfach erweiterbar und erweitert durch Studierende)
 * LFO (Sin, Tri, Saw) mit vielen Parametern (PulseWidth, CycleLength, Phase, Smoothing, Delay, FormMorphing)
 * Envelope (Delay, Attack, Hold, Decay, Sustain, Release)
 * Färbungsfilter (TP, HP) mit einstellbarer Ordnung (auch als fractional, z. B. 0.5 um rosa Rauschen zu erzeugen)
@@ -40,6 +40,7 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 * GUI Basics (Slider, Combo, Button) in JUCE (nur im Editor die Hintergrundfarbe ändern mit diesen drei Elementen)
 * Filtarbor (Filter with arbitrary order).  Ein einfaches Filter (Tief und Hochpass) mit frei wählbarer Ordnung, so dass zB rosa Rauschen erzeugt werden kann (order = 0.5 und Eingang weiß).  
 * Filtarbor mit GUI im Jade Stil. Nutzung von LookAndFeel ![FiltarborMitGUI](/img/FiltarborJadeGui.jpg)
+* Chorus (noch ohne GUI und nicht zu nutzen)
 
 ## Concepts (HowTo in JUCE)
 * How to use the MidiKeyboardComponent
@@ -50,10 +51,11 @@ Dies ist die korrespondierende Seite zum Kurs Digitale Audio Effekte / Digitale 
 
 ## ToDo (nach Priorität sortiert)
 
-* Effekte (Chorus, Delay)
-* Formant Filter (mal in richtig)
-* Oversamping für Wave-shaper (Distortion)
+* Mini (erster echter klassischer Synth (2 Osc + Noise -> Filter + 2 ADSR + 1-2 LFO + Chorus))
 * Modulationsmatrix
 * LFO (Random LFO mit hoher Paramtrisierbarkeit)
+* Effekte (Delay)
+* Formant Filter (mal in richtig)
+* Oversamping für Wave-shaper (Distortion)
 
 Achtung: Work in Progress.
