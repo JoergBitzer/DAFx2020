@@ -96,6 +96,9 @@ void LFO::setLFOFunction(LFOFunctions newFunc)
 	case LFOFunctions::rect:
 		m_lfoBasis = &m_lforect;
 		break;
+	case LFOFunctions::saw:
+		m_lfoBasis = &m_lfosaw;
+		break;
 	case LFOFunctions::tri:
 		m_lfoBasis = &m_lfotri;
 		break;
@@ -114,4 +117,84 @@ void LFO::reset()
 	m_lfoBasis->setSlopeTime(m_slopeTime);
 	m_lfoBasis->reset();
 
+}
+
+int LFOParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParameter>>& paramVector, int instance)
+{
+
+	if (instance < MAX_LFO_INSTANCES)
+	{
+		StringArray a(paramLFOWaveform.Choices);
+
+		paramVector.push_back(std::make_unique<AudioParameterChoice>(paramLFOWaveform.ID[instance],
+			paramLFOWaveform.name,
+			a,
+			paramLFOWaveform.defaultIndex,
+			paramLFOWaveform.unitName));
+
+		paramVector.push_back(std::make_unique<AudioParameterFloat>(paramLFORate.ID[instance],
+			paramLFORate.name,
+			NormalisableRange<float>(paramLFORate.minValue, paramLFORate.maxValue),
+			paramLFORate.defaultValue,
+			paramLFORate.unitName,
+			AudioProcessorParameter::genericParameter,
+			[](float value, int MaxLen) { return (String(int(exp(value)*10+0.5)*0.1, MaxLen) + " Hz"); },
+			[](const String& text) {return text.getFloatValue(); }));
+	}
+	return 0;
+}
+
+LFOParameterComponent::LFOParameterComponent(AudioProcessorValueTreeState &vts, int index, const String& lfoName)
+:m_vts(vts), m_index(index), m_name(lfoName)
+{
+	// Rate
+	m_lforateLabel.setText("Rate",NotificationType::dontSendNotification);
+	addAndMakeVisible(m_lforateLabel);
+	m_lforateSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_lforateSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, true, 80, 20);
+	m_lforateAttachment = std::make_unique<SliderAttachment>(m_vts, paramLFORate.ID[m_index], m_lforateSlider);
+	addAndMakeVisible(m_lforateSlider);
+
+	// Waveform
+	m_lfowaveformLabel.setText("Waveform", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_lfowaveformLabel);
+	
+	StringArray WaveformNames(paramLFOWaveform.Choices);
+	m_lfowaveformCombo.addItemList(WaveformNames, 1);
+
+
+	//m_lfowaveformCombo.onChange = [this]() {itemchanged(); };
+	m_lfowaveformCombo.setSelectedItemIndex(0, false);
+	m_lfowaveformCombo.setJustificationType(Justification::centredRight);
+	m_lfowaveformAttachment = std::make_unique<ComboAttachment>(m_vts, paramLFOWaveform.ID[m_index], m_lfowaveformCombo);
+	//m_lfowaveformCombo.isTextEditable();
+	//m_lfowaveformCombo.setEditableText(true);
+
+
+	addAndMakeVisible(m_lfowaveformCombo);
+
+}
+
+void LFOParameterComponent::paint(Graphics & g)
+{
+	g.fillAll((getLookAndFeel().findColour(ResizableWindow::backgroundColourId)).brighter(0.2));
+
+	g.setColour(Colours::red);
+	auto r = getBounds();
+	g.drawRect(r, 4.0);
+	
+	g.setFont(15.0f);
+	g.drawFittedText(m_name, getLocalBounds().reduced(4.0), Justification::centredTop,1);
+}
+
+#define GUI_MIN_DISTANCE 5
+
+void LFOParameterComponent::resized()
+{
+	auto r = getBounds();
+	//r.removeFromTop(20);
+	m_lforateLabel.setBounds(GUI_MIN_DISTANCE, GUI_MIN_DISTANCE+10,r.getWidth()/4,r.getHeight()/2-GUI_MIN_DISTANCE);
+	m_lforateSlider.setBounds(r.getWidth() / 4 + GUI_MIN_DISTANCE, GUI_MIN_DISTANCE+10, 3*r.getWidth()/4-2*GUI_MIN_DISTANCE, r.getHeight() / 2- GUI_MIN_DISTANCE);
+	m_lfowaveformLabel.setBounds(GUI_MIN_DISTANCE, r.getHeight() / 2+ GUI_MIN_DISTANCE , 2*r.getWidth() / 5, r.getHeight() / 2 - 2*GUI_MIN_DISTANCE);
+	m_lfowaveformCombo.setBounds(2*r.getWidth() / 5 + GUI_MIN_DISTANCE, r.getHeight() / 2 + GUI_MIN_DISTANCE, 3*r.getWidth()/5-2*GUI_MIN_DISTANCE, r.getHeight() / 2 - 2*GUI_MIN_DISTANCE);
 }

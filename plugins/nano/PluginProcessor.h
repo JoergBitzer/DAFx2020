@@ -15,6 +15,10 @@
 #include "NanoSound.h"
 #include "NanoSynth.h"
 #include "NanoVoice.h"
+#include "MoogLadder.h"
+#include "PresetHandler.h"
+
+class  NanoAudioProcessorEditor;
 
 //==============================================================================
 /**
@@ -58,12 +62,23 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
-
+    MidiKeyboardState m_keyboardState;
 private:
     static const int kNumberOfVoices = 16;
     NanoSynth m_synth;
+	NanoSound *m_sound;
+
     std::unique_ptr<NanoSound> m_pSound;
 
-    //==============================================================================
+	//Parameterhandling
+	std::unique_ptr<AudioProcessorValueTreeState> m_parameterVTS;
+	std::vector < std::unique_ptr<RangedAudioParameter>> m_paramVector;
+
+	MoogLadderParameter m_filterparams;
+
+
+	PresetHandler m_presets;
+
+	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NanoAudioProcessor)
 };

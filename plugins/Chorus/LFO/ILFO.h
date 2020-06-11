@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include <vector>
 class ILFO
 {
@@ -16,4 +17,3 @@ protected:
 	double m_fs;
 	double m_startPhase;
 };
-

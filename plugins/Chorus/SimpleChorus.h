@@ -23,6 +23,11 @@ public:
         m_width = width; computeSampleDelay();
     };
     void setRate(float rate_Hz);
+	void setWaveform(LFO::LFOFunctions waveform)
+	{
+		m_lfoLeft.setLFOFunction(waveform); 
+		m_lfoRight.setLFOFunction(waveform);
+	};
 private:
     double m_fs;
     const double m_absolutMaxDelay_ms = 250;

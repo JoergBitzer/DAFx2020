@@ -23,14 +23,29 @@ NanoAudioProcessor::NanoAudioProcessor()
                      #endif
                        )
 #endif
-{
+ {
     for (auto kk = 0; kk < kNumberOfVoices; ++kk)
+    //for (auto kk = 0; kk < 1; ++kk)
     {
         m_synth.addVoice(new NanoVoice());
     }
-    m_pSound = std::make_unique<NanoSound>();
-    m_synth.addSound(*m_pSound);
+    m_sound =  new NanoSound();
+    //m_synth.addSound(*m_pSound);
 
+
+    m_synth.addSound(m_sound);
+	
+	m_filterparams.addParameter(m_paramVector);
+
+	m_parameterVTS = std::make_unique<AudioProcessorValueTreeState>(*this, nullptr, Identifier("NanoVTS"),
+		AudioProcessorValueTreeState::ParameterLayout(m_paramVector.begin(), m_paramVector.end()));
+	m_parameterVTS->state.setProperty("version", JucePlugin_VersionString, nullptr);
+
+	m_sound->m_cutoff = m_parameterVTS->getRawParameterValue(paramCutoff.ID);
+	m_sound->m_reso = m_parameterVTS->getRawParameterValue(paramResonance.ID);
+
+	m_presets.setAudioValueTreeState(m_parameterVTS.get());
+	m_presets.loadAllUserPresets();
 }
 
 NanoAudioProcessor::~NanoAudioProcessor()
@@ -105,7 +120,14 @@ void NanoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     m_synth.prepareToPlay(sampleRate, samplesPerBlock);
-    
+
+/*	String in("Lala");
+	ValueTree vt = m_presets.getPreset(in);
+	String temp = vt.getProperty("presetname");
+
+	if (in == temp)
+		m_parameterVTS->replaceState(vt);
+//*/
 }
 
 void NanoAudioProcessor::releaseResources()
@@ -140,6 +162,7 @@ bool NanoAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
 
 void NanoAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
+    m_keyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     m_synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
@@ -151,7 +174,7 @@ bool NanoAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* NanoAudioProcessor::createEditor()
 {
-    return new NanoAudioProcessorEditor (*this);
+    return static_cast<AudioProcessorEditor*> (new NanoAudioProcessorEditor(*this, *m_parameterVTS, m_presets));
 }
 
 //==============================================================================
@@ -160,12 +183,20 @@ void NanoAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+	auto state = m_parameterVTS->copyState();
+	std::unique_ptr<XmlElement> xml(state.createXml());
+	copyXmlToBinary(*xml, destData);
 }
 
 void NanoAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+	std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+
+	if (xmlState.get() != nullptr)
+		if (xmlState->hasTagName(m_parameterVTS->state.getType()))
+			m_parameterVTS->replaceState(ValueTree::fromXml(*xmlState));
 }
 
 //==============================================================================

@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include "../JuceLibraryCode/JuceHeader.h"
+#include "LFO/LFO.h"
 #include "SimpleChorus.h"
-#include <vector>
+
 //==============================================================================
 /**
 */
@@ -57,12 +58,21 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
-    SimpleChorus m_chorus;
-    std::vector<double> m_dataLeft;
-    std::vector<double> m_dataRight;
-    std::vector<double> m_dataOutLeft;
-    std::vector<double> m_dataOutRight;
-
     //==============================================================================
+		//Parameterhandling
+	SimpleChorus m_chorus;
+	std::vector<double> m_dataLeft;
+	std::vector<double> m_dataRight;
+	std::vector<double> m_dataOutLeft;
+	std::vector<double> m_dataOutRight;
+
+	std::unique_ptr<AudioProcessorValueTreeState> m_parameterVTS;
+	std::vector < std::unique_ptr<RangedAudioParameter>> m_paramVector;
+
+	LFOParameter m_lfoparams;
+	std::atomic <float>* m_rate;
+	float m_oldrate;
+	std::atomic <float>* m_waveform;
+	float m_oldwaveform;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleChorusAudioProcessor)
 };

@@ -22,5 +22,8 @@ public:
     */
     bool appliesToChannel(int midiChannel) { return true; };
 
-};
+	// Params for Moog Ladder
+	std::atomic<float>* m_cutoff;
+	std::atomic<float>* m_reso;
 
+};

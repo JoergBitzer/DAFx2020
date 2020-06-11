@@ -2,10 +2,11 @@
 
 #include <vector>
 #include "../JuceLibraryCode/JuceHeader.h"
-#include <BasicWaveforms.h>
-#include <WavetableOszi.h>
-#include <Envelope.h>
+#include "BasicWaveforms.h"
+#include "WavetableOszi.h"
 #include "MoogLadder.h"
+#include "Envelope.h"
+#include "NanoSound.h"
 
 class NanoVoice : public SynthesiserVoice
 {
@@ -77,15 +78,22 @@ public:
         int numSamples) ;
 
     void prepareVoice(double samplerate, int maxBlockLen);
-    void setPitchBendWidth(double newPitchBendwidth) { m_pitchbendWidth_semitones = newPitchBendwidth; };
+
 private:
     static const int m_wavelen = 512;
     int m_maxLen;
     double m_fs;
     double m_freq;
+    int m_curNote;
 
     double m_a0tuning;
     bool m_isAudioOn;
+
+    // pitchbending
+    const int m_pitchBendMidPos = 8192;
+    double m_pitchbendWidth_semitones;
+   
+
 
     WavetableOszi m_osc;
     BasicWaveforms m_waveforms;
@@ -94,10 +102,18 @@ private:
     // Envelope;
     Envelope m_envelope;
     double m_level;
-    const int m_pitchBendMidPos = 8192;
-    double m_pitchbendWidth_semitones;
     double m_portaTime_ms;
+  
+	MoogLadder m_filter;
+	double m_cutoff;
+	double m_resonance;
 
-    MoogLadder m_filter;
+
+	// Parameter Handling
+//	SynthesiserSound::Ptr m_curSound;
+	NanoSound* m_curSound;
+	float m_oldcutoff;
+	float m_oldreso;
+
 };
 
