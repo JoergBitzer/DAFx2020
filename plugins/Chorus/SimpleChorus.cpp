@@ -37,6 +37,48 @@ void SimpleChorus::setSamplerate(double samplerate)
     setMinDelay();
     setMaxDelay();
     initChorus();
+	m_lowLeftForward.setSamplerate(m_fs);
+	m_lowLeftForward.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassButter);
+	m_lowLeftForward.setCutoff(4000.0);
+
+	m_highLeftForward.setSamplerate(m_fs);
+	m_highLeftForward.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassShelv);
+	m_highLeftForward.setGainIndB(-6.0);
+	m_highLeftForward.setCutoff(1500.0);
+	
+	m_lowRightForward.setSamplerate(m_fs);
+	m_lowRightForward.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassButter);
+	m_lowRightForward.setCutoff(4000.0);
+
+
+
+	m_highRightForward.setSamplerate(m_fs);
+	m_highRightForward.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassShelv);
+	m_highRightForward.setGainIndB(-6.0);
+	m_highRightForward.setCutoff(1500.0);
+
+
+	m_lowLeftFeedback.setSamplerate(m_fs);
+	m_lowLeftFeedback.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassButter);
+	m_lowLeftFeedback.setCutoff(6000.0);
+
+
+	m_highLeftFeedback.setSamplerate(m_fs);
+	m_highLeftFeedback.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassShelv);
+	m_highLeftFeedback.setGainIndB(-2.0);
+	m_highLeftFeedback.setCutoff(1500.0);
+
+	
+	
+	m_lowRightFeedback.setSamplerate(m_fs);
+	m_lowRightFeedback.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassButter);
+	m_lowRightFeedback.setCutoff(6000.0);
+
+	m_highRightFeedback.setSamplerate(m_fs);
+	m_highRightFeedback.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassShelv);
+	m_highRightFeedback.setGainIndB(-2.0);
+	m_highRightFeedback.setCutoff(1500.0);
+
 }
 
 void SimpleChorus::setMaxBlockSize(int maxSize)
@@ -90,10 +132,18 @@ int SimpleChorus::processData(std::vector<double>& dataInLeft, std::vector<doubl
             fracDelayLeft*m_delayMemoryLeft[nextleftReadPos];
 
 
+		double feed_l = m_delayMemoryLeft[leftReadFeedbackPos];
+		feed_l = m_lowLeftFeedback.processOneSample(feed_l);
+		feed_l = m_highLeftFeedback.processOneSample(feed_l);
 
-        m_lastDelayValueLeft = m_delayMemoryLeft[leftReadFeedbackPos];
-
-        dataOutLeft[kk] = m_forward * outLeft + m_blend * curInLeft;
+		m_lastDelayValueLeft = feed_l;
+		
+		
+		
+		double outdata = m_forward * outLeft + m_blend * curInLeft;
+		outdata = m_lowLeftForward.processOneSample(outdata);
+		outdata = m_highLeftForward.processOneSample(outdata);
+		dataOutLeft[kk] = outdata;
 
 
         if (m_nrofchns == 2)
@@ -113,9 +163,17 @@ int SimpleChorus::processData(std::vector<double>& dataInLeft, std::vector<doubl
             outRight = (1.0 - fracDelayRight)*m_delayMemoryRight[rightReadPos] +
                 fracDelayRight*m_delayMemoryRight[nextrightReadPos];
 
-            m_lastDelayValueRight = m_delayMemoryRight[rightReadFeedbackPos];
+			double feed_r = m_delayMemoryRight[rightReadFeedbackPos];
+			feed_r = m_lowRightFeedback.processOneSample(feed_r);
+			feed_r = m_highRightFeedback.processOneSample(feed_r);
 
-            dataOutRight[kk] = m_forward * outRight + m_blend * curInRight;
+
+            m_lastDelayValueRight = feed_r;
+			double outdatar = m_forward * outRight + m_blend * curInRight;
+			outdatar = m_lowRightForward.processOneSample(outdatar);
+			outdatar = m_highRightForward.processOneSample(outdatar);
+
+            dataOutRight[kk] = outdatar;
             
         }
 
@@ -181,4 +239,101 @@ void SimpleChorus::computeSampleDelay()
     m_lfoRight.setMin(m_lfoMinDelay * 0.001 * m_fs);
     m_lfoLeft.setMax(m_lfoMaxDelay * 0.001 * m_fs);
     m_lfoRight.setMax(m_lfoMaxDelay * 0.001 * m_fs);
+}
+
+int ChorusParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParameter>>& paramVector)
+{
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusDelay.ID,
+		paramChorusDelay.name,
+		NormalisableRange<float>(paramChorusDelay.minValue, paramChorusDelay.maxValue),
+		paramChorusDelay.defaultValue,
+		paramChorusDelay.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int((value) * 10 + 0.5)*0.1, MaxLen) + " ms"); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusWidth.ID,
+		paramChorusWidth.name,
+		NormalisableRange<float>(paramChorusWidth.minValue, paramChorusWidth.maxValue),
+		paramChorusWidth.defaultValue,
+		paramChorusWidth.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int((value) * 10 + 0.5)*0.1, MaxLen) + " %"); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusDirectOut.ID,
+		paramChorusDirectOut.name,
+		NormalisableRange<float>(paramChorusDirectOut.minValue, paramChorusDirectOut.maxValue),
+		paramChorusDirectOut.defaultValue,
+		paramChorusDirectOut.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int((value) * 100 + 0.5)*0.01, MaxLen) + ""); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusForward.ID,
+		paramChorusForward.name,
+		NormalisableRange<float>(paramChorusForward.minValue, paramChorusForward.maxValue),
+		paramChorusForward.defaultValue,
+		paramChorusForward.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int((value) * 100 + 0.5)*0.01, MaxLen) + ""); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusFFLow.ID,
+		paramChorusFFLow.name,
+		NormalisableRange<float>(paramChorusFFLow.minValue, paramChorusFFLow.maxValue),
+		paramChorusFFLow.defaultValue,
+		paramChorusFFLow.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int(exp(value) * 10 + 0.5)*0.1, MaxLen) + " Hz"); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusFFHigh.ID,
+		paramChorusFFHigh.name,
+		NormalisableRange<float>(paramChorusFFHigh.minValue, paramChorusFFHigh.maxValue),
+		paramChorusFFHigh.defaultValue,
+		paramChorusFFHigh.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int(exp(value) * 10 + 0.5)*0.1, MaxLen) + " Hz"); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusFeedback.ID,
+		paramChorusFeedback.name,
+		NormalisableRange<float>(paramChorusFeedback.minValue, paramChorusFeedback.maxValue),
+		paramChorusFeedback.defaultValue,
+		paramChorusFeedback.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int((value) * 100 + 0.5)*0.01, MaxLen) + ""); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusFBLow.ID,
+		paramChorusFBLow.name,
+		NormalisableRange<float>(paramChorusFBLow.minValue, paramChorusFBLow.maxValue),
+		paramChorusFBLow.defaultValue,
+		paramChorusFBLow.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int(exp(value) * 10 + 0.5)*0.1, MaxLen) + " Hz"); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusFBHigh.ID,
+		paramChorusFBHigh.name,
+		NormalisableRange<float>(paramChorusFBHigh.minValue, paramChorusFBHigh.maxValue),
+		paramChorusFBHigh.defaultValue,
+		paramChorusFBHigh.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int(exp(value) * 10 + 0.5)*0.1, MaxLen) + " Hz"); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramChorusPhase.ID,
+		paramChorusPhase.name,
+		NormalisableRange<float>(paramChorusPhase.minValue, paramChorusPhase.maxValue),
+		paramChorusPhase.defaultValue,
+		paramChorusPhase.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { return (String(int((value) * 10 + 0.5)*0.1, MaxLen) + ""); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	return 0;
 }

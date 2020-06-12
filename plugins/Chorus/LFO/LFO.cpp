@@ -80,6 +80,12 @@ void LFO::setStartphase(double startPhase)
 	m_lfoBasis->setStartPhase(m_startphase);
 }
 
+void LFO::setPhase(double phase)
+{
+	m_phase = phase;
+	m_lfoBasis->setPhase(m_phase);
+}
+
 void LFO::setSlopeTime(double slopetime)
 {
 	m_slopeTime = slopetime;

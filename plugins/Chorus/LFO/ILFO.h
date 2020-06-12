@@ -8,6 +8,7 @@ public:
 	virtual void setSamplingrate(double samplerate) = 0;
 	virtual void setStartPhase(double phase) = 0;
 	virtual void setSlopeTime(double slopetime) {};
+	virtual void setPhase(double phase);
 	virtual void reset() = 0;
 
 	virtual int getData(std::vector<double>& data) = 0;

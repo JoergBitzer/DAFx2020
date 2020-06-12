@@ -29,6 +29,7 @@ public:
 	void setFrequency(double frequency);
 	void setSamplerate(double samplerate);
 	void setStartphase(double startPhase);
+	void setPhase(double phase);
 	void setSlopeTime(double slopetime);
 	void setLFOFunction(LFOFunctions newFunc);
 	void reset();
@@ -49,6 +50,7 @@ protected:
 	double m_freq;
 	double m_startphase;
 	double m_slopeTime;
+	double m_phase;
 };
 
 

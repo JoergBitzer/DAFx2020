@@ -69,8 +69,9 @@ public:
 	{
 		// DF 2 filter
 		double instate = data - m_a1 * m_state;
+		double Temp =  instate * m_b0 + m_state * m_b1;
 		m_state = instate;
-		return( instate * m_b0 + m_state * m_b1);
+		return Temp;
 	};
 
 private:

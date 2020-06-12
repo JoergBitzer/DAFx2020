@@ -25,6 +25,7 @@ SimpleChorusAudioProcessor::SimpleChorusAudioProcessor()
 #endif
 {
 	m_lfoparams.addParameter(m_paramVector,0);
+	m_chorusparams.addParameter(m_paramVector);
 
 	m_parameterVTS = std::make_unique<AudioProcessorValueTreeState>(*this, nullptr, Identifier("SimpleChorusVTS"),
 		AudioProcessorValueTreeState::ParameterLayout(m_paramVector.begin(), m_paramVector.end()));
@@ -34,14 +35,48 @@ SimpleChorusAudioProcessor::SimpleChorusAudioProcessor()
 	m_oldrate = *m_rate;
 	m_waveform = m_parameterVTS->getRawParameterValue(paramLFOWaveform.ID[0]);
 	m_oldwaveform = *m_waveform;
+	m_delay = m_parameterVTS->getRawParameterValue(paramChorusDelay.ID);
+	m_olddelay = *m_delay;
+	m_width = m_parameterVTS->getRawParameterValue(paramChorusWidth.ID);
+	m_oldwidth = *m_width;
+	m_forward = m_parameterVTS->getRawParameterValue(paramChorusForward.ID);
+	m_oldfeedback = *m_forward;
+	m_feedback = m_parameterVTS->getRawParameterValue(paramChorusFeedback.ID);
+	m_oldfeedback = *m_feedback;
+	m_directout = m_parameterVTS->getRawParameterValue(paramChorusDirectOut.ID);
+	m_olddirectout = *m_directout;
+
+	m_phase = m_parameterVTS->getRawParameterValue(paramChorusPhase.ID);
+	m_oldphase = *m_phase;
+
+	m_lowForward = m_parameterVTS->getRawParameterValue(paramChorusFFLow.ID);
+	m_oldlowForward = *m_lowForward;
+	m_highForward = m_parameterVTS->getRawParameterValue(paramChorusFFHigh.ID);
+	m_oldhighForward = *m_highForward;
+
+	m_lowFeedback = m_parameterVTS->getRawParameterValue(paramChorusFBLow.ID);
+	m_oldlowFeedback = *m_lowFeedback;
+	m_highFeedback = m_parameterVTS->getRawParameterValue(paramChorusFBHigh.ID);
+	m_oldhighFeedback = *m_highFeedback;
 
 
-	m_chorus.setFeedback(0.0);
-	m_chorus.setBlend(1.0);
-	m_chorus.setForward(0.707);
-	m_chorus.setLFOMinDelay(3.0);
-	m_chorus.setLFOMinDelay(9.0);
-	m_chorus.setRate(0.5);
+	m_chorus.setFeedback(*m_feedback);
+	m_chorus.setBlend(*m_directout);
+	m_chorus.setForward(*m_forward);
+
+	m_chorus.setDelay(*m_delay);
+	m_chorus.setWidth(*m_width);
+	m_chorus.setRate(*m_rate);
+	m_chorus.setPhase(*m_phase);
+
+	m_chorus.setLowCutForward(*m_lowForward);
+	m_chorus.setHighCutForward(*m_highForward);
+	m_chorus.setLowCutFeedback(*m_lowFeedback);
+	m_chorus.setHighCutFeedback(*m_highFeedback);
+
+
+
+
 }
 
 SimpleChorusAudioProcessor::~SimpleChorusAudioProcessor()
@@ -172,6 +207,57 @@ void SimpleChorusAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
 		int index = int(*m_waveform + 0.5);
 		m_chorus.setWaveform(static_cast <LFO::LFOFunctions> (index));
 	}
+	if (*m_delay != m_olddelay)
+	{
+		m_olddelay = *m_delay;
+		m_chorus.setDelay((*m_delay));
+	}
+	if (*m_width != m_oldwidth)
+	{
+		m_oldwidth = *m_width;
+		m_chorus.setWidth((*m_width));
+	}
+	if (*m_directout != m_olddirectout)
+	{
+		m_olddirectout = *m_directout;
+		m_chorus.setBlend((*m_directout));
+	}
+	if (*m_forward != m_oldforward)
+	{
+		m_oldforward = *m_forward;
+		m_chorus.setForward((*m_forward));
+	}
+	if (*m_feedback != m_oldfeedback)
+	{
+		m_oldfeedback = *m_feedback;
+		m_chorus.setFeedback((*m_feedback));
+	}
+	if (*m_phase != m_oldphase)
+	{
+		m_oldphase = *m_phase;
+		m_chorus.setPhase((*m_phase));
+	}
+	if (*m_lowForward != m_oldlowForward)
+	{
+		m_oldlowForward = *m_lowForward;
+		m_chorus.setLowCutForward(*m_lowForward);
+	}
+	if (*m_highForward != m_oldhighForward)
+	{
+		m_oldhighForward = *m_highForward;
+		m_chorus.setHighCutForward(*m_highForward);
+	}
+	if (*m_lowFeedback != m_oldlowFeedback)
+	{
+		m_oldlowFeedback = *m_lowFeedback;
+		m_chorus.setLowCutFeedback(*m_lowFeedback);
+	}
+	if (*m_highFeedback != m_oldhighFeedback)
+	{
+		m_oldhighFeedback = *m_highFeedback;
+		m_chorus.setHighCutFeedback(*m_highFeedback);
+	}
+
 
 
 	AudioPlayHead::CurrentPositionInfo info;

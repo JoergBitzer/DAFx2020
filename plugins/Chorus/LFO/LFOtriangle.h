@@ -25,6 +25,7 @@ public:
 	void setFrequency(double frequency);
 	void setSamplingrate (double samplerate);
 	void setStartPhase(double phase);
+	void setPhase(double phase);
 	void reset();
 	//setwidth is setting the width of the signal
 	void setPulseWidth(double newwidth);
@@ -40,6 +41,7 @@ private:
 	//this is the width of the triangle
 	double m_width;
 	void computeDeltaPhase();
+	double m_phaseshift;
 
 };
 

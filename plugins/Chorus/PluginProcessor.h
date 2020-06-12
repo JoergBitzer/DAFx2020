@@ -70,9 +70,35 @@ private:
 	std::vector < std::unique_ptr<RangedAudioParameter>> m_paramVector;
 
 	LFOParameter m_lfoparams;
+	ChorusParameter m_chorusparams;
+
 	std::atomic <float>* m_rate;
 	float m_oldrate;
 	std::atomic <float>* m_waveform;
 	float m_oldwaveform;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleChorusAudioProcessor)
+
+	std::atomic <float>* m_delay;
+	float m_olddelay;
+	std::atomic <float>* m_width;
+	float m_oldwidth;
+	std::atomic <float>* m_directout;
+	float m_olddirectout;
+	std::atomic <float>* m_forward;
+	float m_oldforward;
+	std::atomic <float>* m_feedback;
+	float m_oldfeedback;
+	std::atomic <float>* m_phase;
+	float m_oldphase;
+
+	std::atomic <float>* m_lowForward;
+	float m_oldlowForward;
+	std::atomic <float>* m_highForward;
+	float m_oldhighForward;
+
+	std::atomic <float>* m_lowFeedback;
+	float m_oldlowFeedback;
+	std::atomic <float>* m_highFeedback;
+	float m_oldhighFeedback;
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleChorusAudioProcessor)
 };
