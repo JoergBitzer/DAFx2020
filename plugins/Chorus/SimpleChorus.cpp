@@ -24,8 +24,9 @@ SimpleChorus::SimpleChorus()
     m_lfoRight.setLFOFunction(LFO::LFOFunctions::sinus);
     m_lfoLeft.setFrequency(3.5);
     m_lfoRight.setFrequency(3.5);
-    m_lfoRight.setStartphase(3.14 / 2.0);//Einziger Unterschied zwischen Links und Rechts
-
+    m_lfoRight.setStartphase(0.0);//Einziger Unterschied zwischen Links und Rechts
+	m_width = 0.0;
+	m_nominalDelay = m_absolutMaxDelay_ms / 2.0;
     initChorus();
 }
 
@@ -42,7 +43,7 @@ void SimpleChorus::setSamplerate(double samplerate)
 	m_lowLeftForward.setCutoff(4000.0);
 
 	m_highLeftForward.setSamplerate(m_fs);
-	m_highLeftForward.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassShelv);
+	m_highLeftForward.setDesignroutine(FirstOrderFilter::FilterDesign::lowShelv);
 	m_highLeftForward.setGainIndB(-6.0);
 	m_highLeftForward.setCutoff(1500.0);
 	
@@ -53,7 +54,7 @@ void SimpleChorus::setSamplerate(double samplerate)
 
 
 	m_highRightForward.setSamplerate(m_fs);
-	m_highRightForward.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassShelv);
+	m_highRightForward.setDesignroutine(FirstOrderFilter::FilterDesign::lowShelv);
 	m_highRightForward.setGainIndB(-6.0);
 	m_highRightForward.setCutoff(1500.0);
 
@@ -64,8 +65,8 @@ void SimpleChorus::setSamplerate(double samplerate)
 
 
 	m_highLeftFeedback.setSamplerate(m_fs);
-	m_highLeftFeedback.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassShelv);
-	m_highLeftFeedback.setGainIndB(-2.0);
+	m_highLeftFeedback.setDesignroutine(FirstOrderFilter::FilterDesign::lowShelv);
+	m_highLeftFeedback.setGainIndB(-6.0);
 	m_highLeftFeedback.setCutoff(1500.0);
 
 	
@@ -75,7 +76,7 @@ void SimpleChorus::setSamplerate(double samplerate)
 	m_lowRightFeedback.setCutoff(6000.0);
 
 	m_highRightFeedback.setSamplerate(m_fs);
-	m_highRightFeedback.setDesignroutine(FirstOrderFilter::FilterDesign::lowpassShelv);
+	m_highRightFeedback.setDesignroutine(FirstOrderFilter::FilterDesign::lowShelv);
 	m_highRightFeedback.setGainIndB(-2.0);
 	m_highRightFeedback.setCutoff(1500.0);
 
@@ -201,7 +202,7 @@ void SimpleChorus::initChorus()
 
 void SimpleChorus::setMinDelay()
 {
-    m_nominalDelay = (m_lfoMaxDelay - m_lfoMinDelay)*0.5;
+    m_nominalDelay = (m_lfoMaxDelay - m_lfoMinDelay)*0.5 + m_lfoMinDelay;
     m_nominalDelay_samples = int(m_nominalDelay * 0.001 * m_fs + 0.5);
     if (m_nominalDelay_samples <= 0)
         m_nominalDelay_samples = 1;
@@ -212,7 +213,7 @@ void SimpleChorus::setMinDelay()
 
 void SimpleChorus::setMaxDelay()
 {
-    m_nominalDelay = (m_lfoMaxDelay - m_lfoMinDelay)*0.5;
+    m_nominalDelay = (m_lfoMaxDelay - m_lfoMinDelay)*0.5 + m_lfoMinDelay;
     m_nominalDelay_samples = int(m_nominalDelay * 0.001 * m_fs + 0.5);
     if (m_nominalDelay_samples <= 0)
         m_nominalDelay_samples = 1;
@@ -336,4 +337,143 @@ int ChorusParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParamet
 		[](const String& text) {return text.getFloatValue(); }));
 
 	return 0;
+}
+
+ChorusParameterComponent::ChorusParameterComponent(AudioProcessorValueTreeState & vts)
+	:m_vts(vts), somethingChanged(nullptr)
+{
+	somethingChanged = nullptr;
+	m_delayLabel.setText("Delay", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_delayLabel);
+	m_delaySlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+	m_delaySlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxAbove, true, 80, 20);
+	m_delayAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusDelay.ID, m_delaySlider);
+	addAndMakeVisible(m_delaySlider);
+	m_delaySlider.onValueChange = [this]() {if (somethingChanged != nullptr)  somethingChanged(); };
+
+	m_widthLabel.setText("Width", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_widthLabel);
+	m_widthSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+	m_widthSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 80, 20);
+	m_widthAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusWidth.ID, m_widthSlider);
+	addAndMakeVisible(m_widthSlider);
+	m_widthSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_forwardLabel.setText("Forward", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_forwardLabel);
+	m_forwardSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_forwardSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 80, 20);
+	m_forwardAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusForward.ID, m_forwardSlider);
+	addAndMakeVisible(m_forwardSlider);
+	m_forwardSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_ffLowLabel.setText("FW Low", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_ffLowLabel);
+	m_ffLowSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_ffLowSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 80, 20);
+	m_ffLowAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusFFLow.ID, m_ffLowSlider);
+	addAndMakeVisible(m_ffLowSlider);
+	m_ffLowSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_ffHighLabel.setText("FW High", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_ffHighLabel);
+	m_ffHighSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_ffHighSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 80, 20);
+	m_ffHighAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusFFHigh.ID, m_ffHighSlider);
+	addAndMakeVisible(m_ffHighSlider);
+	m_ffHighSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_feedbackLabel.setText("Feedback", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_feedbackLabel);
+	m_feedbackSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_feedbackSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 80, 20);
+	m_feedbackAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusFeedback.ID, m_feedbackSlider);
+	addAndMakeVisible(m_feedbackSlider);
+	m_feedbackSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_fbLowLabel.setText("FB Low", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_fbLowLabel);
+	m_fbLowSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_fbLowSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 80, 20);
+
+	m_fbLowAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusFBLow.ID, m_fbLowSlider);
+	addAndMakeVisible(m_fbLowSlider);
+	m_fbLowSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_fbHighLabel.setText("FB High", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_fbHighLabel);
+	m_fbHighSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_fbHighSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 80, 20);
+	m_fbHighAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusFBHigh.ID, m_fbHighSlider);
+	addAndMakeVisible(m_fbHighSlider);
+	m_fbHighSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_directLabel.setText("Direct Out", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_directLabel);
+	m_directSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_directSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 80, 20);
+
+	m_directAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusDirectOut.ID, m_directSlider);
+	addAndMakeVisible(m_directSlider);
+	m_directSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_phaseLRLabel.setText("Phase L/R", NotificationType::dontSendNotification);
+	addAndMakeVisible(m_phaseLRLabel);
+	m_phaseLRSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_phaseLRSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 80, 20);
+
+	m_phaseLRAttachment = std::make_unique<SliderAttachment>(m_vts, paramChorusPhase.ID, m_phaseLRSlider);
+	addAndMakeVisible(m_phaseLRSlider);
+	m_phaseLRSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+
+}
+
+void ChorusParameterComponent::paint(Graphics & g)
+{
+	g.fillAll((getLookAndFeel().findColour(ResizableWindow::backgroundColourId)).brighter(0.2));
+
+}
+
+#define GUI_MIN_DISTANCE 5
+#define ELEMNT_HEIGHT 20
+#define FROM_MID_DISTANCE 40
+#define ROTARYSIZE 60
+#define LABEL_WIDTH 60
+void ChorusParameterComponent::resized()
+{
+	int w = getWidth();
+	int h = getHeight();
+
+
+	m_delayLabel.setBounds(GUI_MIN_DISTANCE + ROTARYSIZE, GUI_MIN_DISTANCE, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_delaySlider.setBounds(GUI_MIN_DISTANCE + ROTARYSIZE, GUI_MIN_DISTANCE, w - 2 * GUI_MIN_DISTANCE-2*ROTARYSIZE,2*ELEMNT_HEIGHT);
+
+	m_widthLabel.setBounds(GUI_MIN_DISTANCE + w/2 - LABEL_WIDTH/2, GUI_MIN_DISTANCE + 5 * ELEMNT_HEIGHT, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_widthSlider.setBounds(GUI_MIN_DISTANCE + ROTARYSIZE, GUI_MIN_DISTANCE + 3 * ELEMNT_HEIGHT, w - 2 * GUI_MIN_DISTANCE - 2*ROTARYSIZE, 2 * ELEMNT_HEIGHT);
+
+	m_forwardLabel.setBounds(w/2 + FROM_MID_DISTANCE + GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 4 * ELEMNT_HEIGHT, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_forwardSlider.setBounds(w / 2 + FROM_MID_DISTANCE + GUI_MIN_DISTANCE + LABEL_WIDTH/2-ROTARYSIZE/2, GUI_MIN_DISTANCE + 5 * ELEMNT_HEIGHT, ROTARYSIZE, 3 * ELEMNT_HEIGHT);
+
+	m_ffLowLabel.setBounds(w / 2 + ROTARYSIZE + FROM_MID_DISTANCE + 2*GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 4 * ELEMNT_HEIGHT, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_ffLowSlider.setBounds(w / 2 + ROTARYSIZE + FROM_MID_DISTANCE + 2*GUI_MIN_DISTANCE + LABEL_WIDTH / 2 - ROTARYSIZE / 2, GUI_MIN_DISTANCE + 5 * ELEMNT_HEIGHT, ROTARYSIZE, 3 * ELEMNT_HEIGHT);
+
+	m_ffHighLabel.setBounds(w / 2 + 2*ROTARYSIZE + FROM_MID_DISTANCE + 3 * GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 4 * ELEMNT_HEIGHT, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_ffHighSlider.setBounds(w / 2 + 2*ROTARYSIZE + FROM_MID_DISTANCE + 3 * GUI_MIN_DISTANCE + LABEL_WIDTH / 2 - ROTARYSIZE / 2, GUI_MIN_DISTANCE + 5 * ELEMNT_HEIGHT, ROTARYSIZE, 3 * ELEMNT_HEIGHT);
+
+	m_fbHighLabel.setBounds(w / 2 - ROTARYSIZE - FROM_MID_DISTANCE - GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 4 * ELEMNT_HEIGHT, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_fbHighSlider.setBounds(w / 2 - ROTARYSIZE - FROM_MID_DISTANCE - GUI_MIN_DISTANCE - LABEL_WIDTH / 2 + ROTARYSIZE / 2, GUI_MIN_DISTANCE + 5 * ELEMNT_HEIGHT, ROTARYSIZE, 3 * ELEMNT_HEIGHT);
+
+	m_fbLowLabel.setBounds(w / 2 - 2*ROTARYSIZE - FROM_MID_DISTANCE - 2 * GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 4 * ELEMNT_HEIGHT, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_fbLowSlider.setBounds(w / 2 - 2*ROTARYSIZE - FROM_MID_DISTANCE - 2 * GUI_MIN_DISTANCE - LABEL_WIDTH / 2 + ROTARYSIZE / 2, GUI_MIN_DISTANCE + 5 * ELEMNT_HEIGHT, ROTARYSIZE, 3 * ELEMNT_HEIGHT);
+
+	m_feedbackLabel.setBounds(w / 2 - 3 * ROTARYSIZE - FROM_MID_DISTANCE - 3 * GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 4 * ELEMNT_HEIGHT, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_feedbackSlider.setBounds(w / 2 - 3 * ROTARYSIZE - FROM_MID_DISTANCE - 3 * GUI_MIN_DISTANCE - LABEL_WIDTH / 2 + ROTARYSIZE / 2, GUI_MIN_DISTANCE + 5 * ELEMNT_HEIGHT, ROTARYSIZE, 3 * ELEMNT_HEIGHT);
+
+	m_directLabel.setBounds(GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 2 * ELEMNT_HEIGHT, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_directSlider.setBounds(GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 3 * ELEMNT_HEIGHT, ROTARYSIZE, 3 * ELEMNT_HEIGHT);
+
+	m_phaseLRLabel.setBounds(w-GUI_MIN_DISTANCE-LABEL_WIDTH, GUI_MIN_DISTANCE + 2 * ELEMNT_HEIGHT, LABEL_WIDTH, ELEMNT_HEIGHT);
+	m_phaseLRSlider.setBounds(w-GUI_MIN_DISTANCE-ROTARYSIZE, GUI_MIN_DISTANCE + 3 * ELEMNT_HEIGHT, ROTARYSIZE, 3 * ELEMNT_HEIGHT);
+
 }

@@ -9,6 +9,7 @@ LFOtriangle::LFOtriangle()
 	m_startPhase = 0.0;
 	m_width = 2.0 * M_PI;
 	m_phaseshift = 0.0;
+	m_oldphaseshift = 0.0;
 
 }
 
@@ -37,11 +38,15 @@ void LFOtriangle::setStartPhase(double phase)
 void LFOtriangle::setPhase(double phase)
 {
 	m_phaseshift = phase;
+	m_curPhase += m_phaseshift;
+	m_curPhase -= m_oldphaseshift;
+	m_oldphaseshift = m_phaseshift;
 }
 
 
 void LFOtriangle::reset()
 {
+	m_oldphaseshift = 0.0;
 	m_curPhase = m_startPhase;
 }
 
@@ -55,14 +60,26 @@ int LFOtriangle::getData(std::vector<double>& data)
 {
 	for (unsigned int kk = 0; kk < data.size(); kk++)
 	{
-		double curPhase = m_curPhase + m_phaseshift;
-		
+		m_curPhase += m_deltaPhase;
 
-		if (curPhase > m_width)
+		if (m_curPhase >= M_PI)
+		{
+			m_curPhase = M_PI - (m_curPhase - M_PI);
+			m_deltaPhase = -m_deltaPhase;
+		}
+		if (m_curPhase <= 0.0)
+		{
+			m_curPhase = -m_curPhase;
+			m_deltaPhase = -m_deltaPhase;
+		}
+
+		data.at(kk) = m_curPhase / (m_width / 2);
+
+/*		if (curPhase > m_width)
 		{
 			//no more values except '0', since the triangle is then complete
 			//data.at(kk) = 0;
-			if (m_width >= 2.0*M_PI)
+			if (curPhase >= 2.0*M_PI)
 				curPhase -= m_width;
 			else
 			{
@@ -88,6 +105,7 @@ int LFOtriangle::getData(std::vector<double>& data)
 			m_curPhase -= 2.0 * M_PI;
 			
 		}
+		//*/
 	}
 	return 0;
 }

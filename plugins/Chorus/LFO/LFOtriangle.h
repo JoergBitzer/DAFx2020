@@ -42,6 +42,8 @@ private:
 	double m_width;
 	void computeDeltaPhase();
 	double m_phaseshift;
+	double m_oldphaseshift;
+	double m_inc;
 
 };
 

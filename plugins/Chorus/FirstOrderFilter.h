@@ -10,10 +10,10 @@ public:
 	{
 		lowpassSmooth,
 		lowpassButter,
-		lowpassShelv,
+		lowShelv,
 		highpassSmooth,
 		highpassButter,
-		highpassShelv,
+		highShelv,
 		none
 	};
 	FirstOrderFilter() :m_fs(44100.0), m_cutoff(1000.0), m_gain_db(0.0),
@@ -65,15 +65,22 @@ public:
 		}
 		return 0;
 	};
-	inline double processOneSample(float data)
+	inline float processOneSample(float data)
 	{
 		// DF 2 filter
 		double instate = data - m_a1 * m_state;
-		double Temp =  instate * m_b0 + m_state * m_b1;
+		float Temp =  instate * m_b0 + m_state * m_b1;
 		m_state = instate;
 		return Temp;
 	};
-
+	inline double processOneSample(double data)
+	{
+		// DF 2 filter
+		double instate = data - m_a1 * m_state;
+		double Temp = instate * m_b0 + m_state * m_b1;
+		m_state = instate;
+		return Temp;
+	};
 private:
 	double m_b0, m_b1, m_a1;
 	double m_state;
@@ -121,7 +128,7 @@ private:
 			m_a1 = ((2.0 + cos(om)) - sqrt((2 + cos(om)) * (2 + cos(om)) - 1.0));
 			m_b0 = m_a1 - 1.0;
 			break;
-		case FilterDesign::lowpassShelv:
+		case FilterDesign::lowShelv:
 			A = pow(10.0, m_gain_db / 40.0); // 40 see RBJ cookbook
 			fcut = tan(PI_M * m_cutoff / m_fs) * 2.0 * m_fs;
 			w = 2.0 * m_fs;
@@ -130,7 +137,7 @@ private:
 			m_b1 = - A* (w-A*fcut)*Norm;
 			m_a1 = -(A*w - fcut) * Norm;
 			break;
-		case FilterDesign::highpassShelv:
+		case FilterDesign::highShelv:
 			A = pow(10.0, m_gain_db / 40.0); // 40 see RBJ cookbook
 			fcut = tan(PI_M * m_cutoff / m_fs) * 2.0 * m_fs;
 			w = 2.0 * m_fs;

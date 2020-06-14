@@ -9,7 +9,8 @@ LFO::LFO()
 	m_amplitude(1.0),
 	m_maxmin(2.0),
 	m_startphase(0.0),
-	m_slopeTime(0.0)
+	m_slopeTime(0.0),
+	m_phase(0.0)
 {
 	m_lfoBasis = &m_lfotri;
 }
@@ -80,6 +81,12 @@ void LFO::setStartphase(double startPhase)
 	m_lfoBasis->setStartPhase(m_startphase);
 }
 
+void LFO::setPhase(double phase)
+{
+	m_phase = phase;
+	m_lfoBasis->setPhase(m_phase);
+}
+
 void LFO::setSlopeTime(double slopetime)
 {
 	m_slopeTime = slopetime;
@@ -116,6 +123,7 @@ void LFO::reset()
 	m_lfoBasis->setStartPhase(m_startphase);
 	m_lfoBasis->setSlopeTime(m_slopeTime);
 	m_lfoBasis->reset();
+	m_lfoBasis->setPhase(m_phase);
 
 }
 
@@ -145,7 +153,7 @@ int LFOParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParameter>
 }
 
 LFOParameterComponent::LFOParameterComponent(AudioProcessorValueTreeState &vts, int index, const String& lfoName)
-:m_vts(vts), m_index(index), m_name(lfoName)
+:m_vts(vts), m_index(index), m_name(lfoName), m_style(LFOComponentStyle::longhorizontal),somethingChanged(nullptr)
 {
 	// Rate
 	m_lforateLabel.setText("Rate",NotificationType::dontSendNotification);
@@ -154,6 +162,7 @@ LFOParameterComponent::LFOParameterComponent(AudioProcessorValueTreeState &vts, 
 	m_lforateSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, true, 80, 20);
 	m_lforateAttachment = std::make_unique<SliderAttachment>(m_vts, paramLFORate.ID[m_index], m_lforateSlider);
 	addAndMakeVisible(m_lforateSlider);
+	m_lforateSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
 
 	// Waveform
 	m_lfowaveformLabel.setText("Waveform", NotificationType::dontSendNotification);
@@ -172,6 +181,7 @@ LFOParameterComponent::LFOParameterComponent(AudioProcessorValueTreeState &vts, 
 
 
 	addAndMakeVisible(m_lfowaveformCombo);
+	m_lfowaveformCombo.onChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
 
 }
 
@@ -183,18 +193,44 @@ void LFOParameterComponent::paint(Graphics & g)
 	auto r = getBounds();
 	g.drawRect(r, 4.0);
 	
-	g.setFont(15.0f);
-	g.drawFittedText(m_name, getLocalBounds().reduced(4.0), Justification::centredTop,1);
+//	g.setFont(15.0f);
+//	g.drawFittedText(m_name, getLocalBounds().reduced(4.0), Justification::centredTop,1);
 }
 
 #define GUI_MIN_DISTANCE 5
-
+#define ELEMNT_HEIGHT 20
+#define ROTARYSIZE 40
+#define LABEL_WIDTH 60
+#define COMBO_WIDTH 80
 void LFOParameterComponent::resized()
 {
-	auto r = getBounds();
-	//r.removeFromTop(20);
-	m_lforateLabel.setBounds(GUI_MIN_DISTANCE, GUI_MIN_DISTANCE+10,r.getWidth()/4,r.getHeight()/2-GUI_MIN_DISTANCE);
-	m_lforateSlider.setBounds(r.getWidth() / 4 + GUI_MIN_DISTANCE, GUI_MIN_DISTANCE+10, 3*r.getWidth()/4-2*GUI_MIN_DISTANCE, r.getHeight() / 2- GUI_MIN_DISTANCE);
-	m_lfowaveformLabel.setBounds(GUI_MIN_DISTANCE, r.getHeight() / 2+ GUI_MIN_DISTANCE , 2*r.getWidth() / 5, r.getHeight() / 2 - 2*GUI_MIN_DISTANCE);
-	m_lfowaveformCombo.setBounds(2*r.getWidth() / 5 + GUI_MIN_DISTANCE, r.getHeight() / 2 + GUI_MIN_DISTANCE, 3*r.getWidth()/5-2*GUI_MIN_DISTANCE, r.getHeight() / 2 - 2*GUI_MIN_DISTANCE);
+	if (m_style == LFOComponentStyle::compact)
+	{
+		auto r = getBounds();
+		//r.removeFromTop(20);
+		m_lforateLabel.setBounds(GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 10, r.getWidth() / 4, r.getHeight() / 2 - GUI_MIN_DISTANCE);
+		m_lforateSlider.setBounds(r.getWidth() / 4 + GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 10, 3 * r.getWidth() / 4 - 2 * GUI_MIN_DISTANCE, r.getHeight() / 2 - GUI_MIN_DISTANCE);
+		m_lfowaveformLabel.setBounds(GUI_MIN_DISTANCE, r.getHeight() / 2 + GUI_MIN_DISTANCE, 2 * r.getWidth() / 5, r.getHeight() / 2 - 2 * GUI_MIN_DISTANCE);
+		m_lfowaveformCombo.setBounds(2 * r.getWidth() / 5 + GUI_MIN_DISTANCE, r.getHeight() / 2 + GUI_MIN_DISTANCE, 3 * r.getWidth() / 5 - 2 * GUI_MIN_DISTANCE, r.getHeight() / 2 - 2 * GUI_MIN_DISTANCE);
+	}
+	if (m_style == LFOComponentStyle::longhorizontal)
+	{
+		auto r = getLocalBounds();
+		r.removeFromLeft(GUI_MIN_DISTANCE);
+		//m_lforateLabel.setVisible(false);
+		m_lforateLabel.setBounds(r.removeFromLeft(LABEL_WIDTH));
+		r.removeFromLeft(GUI_MIN_DISTANCE);
+		m_lforateSlider.setBounds(r.removeFromLeft(3*ROTARYSIZE));
+		r.removeFromLeft(2*GUI_MIN_DISTANCE);
+		m_lfowaveformLabel.setBounds(r.removeFromLeft(LABEL_WIDTH));
+		r.removeFromLeft(GUI_MIN_DISTANCE);
+		m_lfowaveformCombo.setBounds(r.removeFromLeft(COMBO_WIDTH));
+
+	}
+}
+
+void LFOParameterComponent::setStyle(LFOComponentStyle style)
+{
+	m_style = style;
+	resized();
 }

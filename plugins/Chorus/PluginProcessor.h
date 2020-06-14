@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "LFO/LFO.h"
 #include "SimpleChorus.h"
+#include "PresetHandler.h"
 
 //==============================================================================
 /**
@@ -99,6 +100,8 @@ private:
 	float m_oldlowFeedback;
 	std::atomic <float>* m_highFeedback;
 	float m_oldhighFeedback;
+
+	PresetHandler m_presets;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleChorusAudioProcessor)
 };

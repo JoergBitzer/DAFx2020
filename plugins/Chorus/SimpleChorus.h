@@ -36,7 +36,7 @@ public:
 	};
 	void setPhase(double phase_degree)
 	{
-		m_phase = phase_degree / 180.0*M_PI; m_lfoRight.setStartphase(m_phase);
+		m_phase = phase_degree / 180.0*M_PI; m_lfoRight.setPhase(m_phase);
 	};
 	void setLowCutForward(double cutoff)
 	{
@@ -108,6 +108,7 @@ private:
 
 #ifdef USE_JUCE
 #include <JuceHeader.h>
+#include "PresetHandler.h"
 // several IDs to allow more than one instance
 #define MAX_LFO_INSTANCES 4
 
@@ -117,7 +118,7 @@ const struct
 	std::string name = "Delay";
 	std::string unitName = "ms";
 	float minValue = (0.5);
-	float maxValue = (250.f);
+	float maxValue = (50.f);
 	float defaultValue = (6.f);
 }paramChorusDelay;
 const struct
@@ -155,7 +156,7 @@ const struct
 	const std::string ID = "Feedback";
 	std::string name = "Feedback Gain";
 	std::string unitName = "";
-	float minValue = (0.f);
+	float minValue = (-0.999f);
 	float maxValue = (0.999f);
 	float defaultValue = (0.f);
 }paramChorusFeedback;
@@ -216,4 +217,60 @@ public:
 	int addParameter(std::vector < std::unique_ptr<RangedAudioParameter>>& paramVector);
 };
 
+typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboAttachment;
+class ChorusParameterComponent : public Component
+{
+public:
+	ChorusParameterComponent(AudioProcessorValueTreeState&);
+
+	void paint(Graphics& g) override;
+	void resized() override;
+	std::function<void()> somethingChanged;
+
+
+private:
+	AudioProcessorValueTreeState& m_vts;
+
+	Label m_delayLabel;
+	Slider m_delaySlider;
+	std::unique_ptr<SliderAttachment> m_delayAttachment;
+
+	Label m_widthLabel;
+	Slider m_widthSlider;
+	std::unique_ptr<SliderAttachment> m_widthAttachment;
+
+	Label m_forwardLabel;
+	Slider m_forwardSlider;
+	std::unique_ptr<SliderAttachment> m_forwardAttachment;
+
+	Label m_ffLowLabel;
+	Slider m_ffLowSlider;
+	std::unique_ptr<SliderAttachment> m_ffLowAttachment;
+
+	Label m_ffHighLabel;
+	Slider m_ffHighSlider;
+	std::unique_ptr<SliderAttachment> m_ffHighAttachment;
+
+	Label m_feedbackLabel;
+	Slider m_feedbackSlider;
+	std::unique_ptr<SliderAttachment> m_feedbackAttachment;
+
+	Label m_fbLowLabel;
+	Slider m_fbLowSlider;
+	std::unique_ptr<SliderAttachment> m_fbLowAttachment;
+
+	Label m_fbHighLabel;
+	Slider m_fbHighSlider;
+	std::unique_ptr<SliderAttachment> m_fbHighAttachment;
+
+	Label m_directLabel;
+	Slider m_directSlider;
+	std::unique_ptr<SliderAttachment> m_directAttachment;
+
+	Label m_phaseLRLabel;
+	Slider m_phaseLRSlider;
+	std::unique_ptr<SliderAttachment> m_phaseLRAttachment;
+
+};
 #endif

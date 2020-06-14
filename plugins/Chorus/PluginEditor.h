@@ -13,6 +13,8 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 #include "LFO/LFO.h"
+#include "SimpleChorus.h"
+#include "PresetHandler.h"
 
 //==============================================================================
 /**
@@ -20,7 +22,7 @@
 class SimpleChorusAudioProcessorEditor  : public AudioProcessorEditor
 {
 public:
-    SimpleChorusAudioProcessorEditor (SimpleChorusAudioProcessor&, AudioProcessorValueTreeState&);
+    SimpleChorusAudioProcessorEditor (SimpleChorusAudioProcessor&, AudioProcessorValueTreeState&, PresetHandler &);
     ~SimpleChorusAudioProcessorEditor();
 
     //==============================================================================
@@ -32,8 +34,11 @@ private:
     // access the processor object that created it.
     SimpleChorusAudioProcessor& m_processor;
 	AudioProcessorValueTreeState& m_vts;
+	PresetComponent m_presetGUI;
 
 	LFOParameterComponent m_lfo1params;
+	ChorusParameterComponent m_chorusparams;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleChorusAudioProcessorEditor)
 };

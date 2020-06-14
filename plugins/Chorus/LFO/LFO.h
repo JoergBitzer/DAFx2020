@@ -100,6 +100,8 @@ public:
 	LFOParameterComponent(AudioProcessorValueTreeState&,int index, const String& lfoName);
 	void paint(Graphics& g) override;
 	void resized() override;
+	void setStyle(LFOComponentStyle style);
+	std::function<void()> somethingChanged;
 
 private:
 	int m_index;
@@ -111,5 +113,6 @@ private:
 	Slider m_lforateSlider;
 	std::unique_ptr<SliderAttachment> m_lforateAttachment;
 	AudioProcessorValueTreeState& m_vts;
+	LFOComponentStyle m_style;
 };
 #endif

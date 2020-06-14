@@ -31,6 +31,9 @@ SimpleChorusAudioProcessor::SimpleChorusAudioProcessor()
 		AudioProcessorValueTreeState::ParameterLayout(m_paramVector.begin(), m_paramVector.end()));
 	m_parameterVTS->state.setProperty("version", JucePlugin_VersionString, nullptr);
 
+	m_presets.setAudioValueTreeState(m_parameterVTS.get());
+	m_presets.loadAllUserPresets();
+
 	m_rate = m_parameterVTS->getRawParameterValue(paramLFORate.ID[0]);
 	m_oldrate = *m_rate;
 	m_waveform = m_parameterVTS->getRawParameterValue(paramLFOWaveform.ID[0]);
@@ -260,8 +263,8 @@ void SimpleChorusAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
 
 
 
-	AudioPlayHead::CurrentPositionInfo info;
-	getPlayHead()->getCurrentPosition(info);
+	//AudioPlayHead::CurrentPositionInfo info;
+	//getPlayHead()->getCurrentPosition(info);
 
 
 
@@ -324,7 +327,7 @@ bool SimpleChorusAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* SimpleChorusAudioProcessor::createEditor()
 {
-    return new SimpleChorusAudioProcessorEditor (*this, *m_parameterVTS);
+    return new SimpleChorusAudioProcessorEditor (*this, *m_parameterVTS, m_presets);
 }
 
 //==============================================================================

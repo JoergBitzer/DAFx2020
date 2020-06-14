@@ -29,6 +29,7 @@ public:
 	void setFrequency(double frequency);
 	void setSamplerate(double samplerate);
 	void setStartphase(double startPhase);
+	void setPhase(double phase);
 	void setSlopeTime(double slopetime);
 	void setLFOFunction(LFOFunctions newFunc);
 	void reset();
@@ -49,6 +50,7 @@ protected:
 	double m_freq;
 	double m_startphase;
 	double m_slopeTime;
+	double m_phase;
 };
 
 
@@ -98,6 +100,8 @@ public:
 	LFOParameterComponent(AudioProcessorValueTreeState&,int index, const String& lfoName);
 	void paint(Graphics& g) override;
 	void resized() override;
+	void setStyle(LFOComponentStyle style);
+	std::function<void()> somethingChanged;
 
 private:
 	int m_index;
@@ -109,5 +113,6 @@ private:
 	Slider m_lforateSlider;
 	std::unique_ptr<SliderAttachment> m_lforateAttachment;
 	AudioProcessorValueTreeState& m_vts;
+	LFOComponentStyle m_style;
 };
 #endif
