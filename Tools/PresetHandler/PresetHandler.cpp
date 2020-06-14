@@ -188,7 +188,7 @@ int PresetHandler::getAllKeys(std::vector<String>& keys)
 		//String cat = vt.getProperty("category");
 
 PresetComponent::PresetComponent(PresetHandler& ph)
-	:m_presetHandler(ph), m_somethingchanged(false)
+	:m_presetHandler(ph), m_somethingchanged(false), m_hidecategory(false)
 {
 	m_nextButton.setButtonText("Next");
 	m_nextButton.onClick = [this]() {nextButtonClick(); };
@@ -246,7 +246,13 @@ void PresetComponent::paint(Graphics & g)
 void PresetComponent::resized()
 {
 	m_presetCombo.setBounds(getWidth() / 2 - COMBO_WITH / 2, 3, COMBO_WITH, ELEMENT_HEIGHT);
+	if (m_hidecategory)
+		m_categoriesCombo.setVisible(false);
+
 	m_categoriesCombo.setBounds(getWidth() / 2 + COMBO_WITH / 2 + 2*BUTTON_WIDTH + 3*ELEMENT_DIST, 3, COMBO_WITH/2, ELEMENT_HEIGHT);
+	if (m_hidecategory)
+		m_categoriesCombo.setVisible(false);
+
 	m_nextButton.setBounds(getWidth() / 2 + COMBO_WITH / 2 + ELEMENT_DIST/2, 3, BUTTON_WIDTH, ELEMENT_HEIGHT);
 	m_saveButton.setBounds(getWidth() / 2 + COMBO_WITH / 2 + 2*ELEMENT_DIST + BUTTON_WIDTH, 3, BUTTON_WIDTH, ELEMENT_HEIGHT);
 	m_prevButton.setBounds(getWidth() / 2 - COMBO_WITH / 2 - ELEMENT_DIST/2 - BUTTON_WIDTH, 3, BUTTON_WIDTH, ELEMENT_HEIGHT);
@@ -255,6 +261,11 @@ void PresetComponent::resized()
 	auto s = r.removeFromRight(3*COMBO_WITH / 4 + ELEMENT_DIST);
 	m_categoriesCombo.setBounds(s.getX(), 3, 3*COMBO_WITH / 4, ELEMENT_HEIGHT);
 
+}
+
+void PresetComponent::setNoCategory()
+{
+	m_hidecategory = true;
 }
 
 void PresetComponent::nextButtonClick()

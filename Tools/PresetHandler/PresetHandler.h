@@ -61,6 +61,7 @@ public:
 	void setSomethingChanged() {
 		m_somethingchanged = true; repaint();
 	};
+	void setNoCategory();
 
 private:
 	ComboBox m_presetCombo;
@@ -79,4 +80,5 @@ private:
 
 	String m_oldcatname;
 	bool m_somethingchanged;
+	bool m_hidecategory;
 };
