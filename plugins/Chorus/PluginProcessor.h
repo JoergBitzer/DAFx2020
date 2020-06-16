@@ -105,3 +105,10 @@ private:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleChorusAudioProcessor)
 };
+/*
+bool isBusesLayoutSupported(const BusesLayout& layouts) const override
+{
+	// the sidechain can take any layout, the main bus needs to be the same on the input and output
+	return layouts.getMainInputChannelSet() == layouts.getMainOutputChannelSet();
+	// && ! layouts.getMainInputChannelSet().isDisabled(); <- remove this
+}*/

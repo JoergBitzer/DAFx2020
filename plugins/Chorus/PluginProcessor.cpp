@@ -141,7 +141,10 @@ void SimpleChorusAudioProcessor::setCurrentProgram (int index)
 
 const String SimpleChorusAudioProcessor::getProgramName (int index)
 {
-    return {};
+	if (index == 0)
+		return "Init";
+    
+	return {};
 }
 
 void SimpleChorusAudioProcessor::changeProgramName (int index, const String& newName)
@@ -285,20 +288,27 @@ void SimpleChorusAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
     // Make sure to reset the state if your inner loop is processing
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
+	
+	int NrOoSamples = buffer.getNumSamples();
+	m_dataLeft.resize(NrOoSamples);
+	m_dataRight.resize(NrOoSamples);
+	m_dataOutLeft.resize(NrOoSamples);
+	m_dataOutRight.resize(NrOoSamples);
+
 	auto* left = buffer.getWritePointer(0);
-	for (auto kk = 0u; kk < buffer.getNumSamples(); ++kk)
+	for (auto kk = 0u; kk < NrOoSamples; ++kk)
 		m_dataLeft[kk] = left[kk];
 
 	if (totalNumInputChannels == 2 && totalNumInputChannels == totalNumOutputChannels)
 	{
 		m_chorus.setNrofChns(2);
 		auto* right = buffer.getWritePointer(1);
-		for (auto kk = 0u; kk < buffer.getNumSamples(); ++kk)
+		for (auto kk = 0u; kk < NrOoSamples; ++kk)
 			m_dataRight[kk] = right[kk];
 	}
 	else
 	{
-		for (auto kk = 0u; kk < buffer.getNumSamples(); ++kk)
+		for (auto kk = 0u; kk < NrOoSamples; ++kk)
 			m_dataRight[kk] = left[kk];
 	}
 
@@ -311,10 +321,10 @@ void SimpleChorusAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
 
 		// ..do something to the data...
 		if (channel == 0)
-			for (auto kk = 0u; kk < buffer.getNumSamples(); ++kk)
+			for (auto kk = 0u; kk < NrOoSamples; ++kk)
 				channelData[kk] = m_dataOutLeft[kk];
 		if (channel == 1)
-			for (auto kk = 0u; kk < buffer.getNumSamples(); ++kk)
+			for (auto kk = 0u; kk < NrOoSamples; ++kk)
 				channelData[kk] = m_dataOutRight[kk];
 	}
 }

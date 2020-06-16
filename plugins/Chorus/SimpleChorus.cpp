@@ -90,10 +90,14 @@ void SimpleChorus::setMaxBlockSize(int maxSize)
 
 int SimpleChorus::processData(std::vector<double>& dataInLeft, std::vector<double>& dataInRight, std::vector<double>& dataOutLeft, std::vector<double>& dataOutRight)
 {
+	int NroOfSamples = dataInLeft.size();
+	m_lfoDataLeft.resize(NroOfSamples);
+	m_lfoDataRight.resize(NroOfSamples);
+
     m_lfoLeft.getData(m_lfoDataLeft);
     m_lfoRight.getData(m_lfoDataRight);
 
-    for (auto kk = 0U; kk < dataInLeft.size(); ++kk)
+    for (auto kk = 0U; kk < NroOfSamples; ++kk)
     {
         double curDelayLeft = m_lfoDataLeft[kk];
         int curDelayLeftInt = static_cast<int>(curDelayLeft);
