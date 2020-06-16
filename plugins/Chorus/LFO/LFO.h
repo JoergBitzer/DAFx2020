@@ -13,9 +13,9 @@ public:
 	enum LFOFunctions
 	{
 		sinus,
+		tri,
 		rect,
 		saw,
-		tri,
 		sampleAndHold,
 		nroflfofunctions
 	};
@@ -64,7 +64,7 @@ const struct
 	const std::string ID[MAX_LFO_INSTANCES] = { "LFO1Waveform", "LFO2Waveform", "LFO3Waveform", "LFO4Waveform" };
 	std::string name = "Waveform";
 	std::string unitName = "";
-	const char* Choices[4] = { "sinus","rectangular","sawtooth","triangle" };
+	const char* Choices[4] = { "sinus","triangle","rectangular","sawtooth"};
 	int defaultIndex = 0;
 }paramLFOWaveform;
 

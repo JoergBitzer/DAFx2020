@@ -15,7 +15,7 @@
 #include "LFO/LFO.h"
 #include "SimpleChorus.h"
 #include "PresetHandler.h"
-
+#include "JadeLookAndFeel.h"
 //==============================================================================
 /**
 */
@@ -30,6 +30,7 @@ public:
     void resized() override;
 
 private:
+	JadeLookAndFeel m_jade;
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SimpleChorusAudioProcessor& m_processor;

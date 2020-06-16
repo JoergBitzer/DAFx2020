@@ -9,7 +9,7 @@ LFOtriangle::LFOtriangle()
 	m_startPhase = 0.0;
 	m_width = 2.0 * M_PI;
 	m_phaseshift = 0.0;
-	m_oldphaseshift = 0.0;
+	//m_oldphaseshift = 0.0;
 
 }
 
@@ -27,6 +27,7 @@ void LFOtriangle::setSamplingrate(double samplerate)
 {
 	m_fs = samplerate;
 	computeDeltaPhase();
+	reset();
 }
 
 void LFOtriangle::setStartPhase(double phase)
@@ -38,15 +39,14 @@ void LFOtriangle::setStartPhase(double phase)
 void LFOtriangle::setPhase(double phase)
 {
 	m_phaseshift = phase;
-	m_curPhase += m_phaseshift;
-	m_curPhase -= m_oldphaseshift;
-	m_oldphaseshift = m_phaseshift;
+//	m_curPhase += m_phaseshift;
+//	m_curPhase -= m_oldphaseshift;
+//	m_oldphaseshift = m_phaseshift;
 }
 
 
 void LFOtriangle::reset()
 {
-	m_oldphaseshift = 0.0;
 	m_curPhase = m_startPhase;
 }
 
@@ -62,18 +62,23 @@ int LFOtriangle::getData(std::vector<double>& data)
 	{
 		m_curPhase += m_deltaPhase;
 
-		if (m_curPhase >= M_PI)
+		double curPhase = m_curPhase + m_phaseshift;
+		if (curPhase >= 2.0*M_PI)
+			curPhase -= 2.0*M_PI;
+
+		if (curPhase >= M_PI)
 		{
-			m_curPhase = M_PI - (m_curPhase - M_PI);
-			m_deltaPhase = -m_deltaPhase;
-		}
-		if (m_curPhase <= 0.0)
-		{
-			m_curPhase = -m_curPhase;
-			m_deltaPhase = -m_deltaPhase;
+			curPhase = 2.0* M_PI - curPhase;
 		}
 
-		data.at(kk) = m_curPhase / (m_width / 2);
+		data.at(kk) = curPhase / M_PI;
+		
+		
+		if (m_curPhase >= 2.0 * M_PI)
+		{
+			m_curPhase -= 2.0 * M_PI;
+
+		}
 
 /*		if (curPhase > m_width)
 		{
@@ -99,12 +104,7 @@ int LFOtriangle::getData(std::vector<double>& data)
 
 		m_curPhase += m_deltaPhase;
 		
-
-		if (m_curPhase >= 2.0 * M_PI)
-		{
-			m_curPhase -= 2.0 * M_PI;
-			
-		}
+*/
 		//*/
 	}
 	return 0;

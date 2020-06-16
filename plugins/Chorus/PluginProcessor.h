@@ -57,8 +57,9 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
-
+	void numBusesChanged() override;
 private:
+	int m_nrofbusses;
     //==============================================================================
 		//Parameterhandling
 	SimpleChorus m_chorus;
@@ -102,6 +103,7 @@ private:
 	float m_oldhighFeedback;
 
 	PresetHandler m_presets;
+	CriticalSection objectLock;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleChorusAudioProcessor)
 };

@@ -36,7 +36,8 @@ public:
 	};
 	void setPhase(double phase_degree)
 	{
-		m_phase = phase_degree / 180.0*M_PI; m_lfoRight.setPhase(m_phase);
+		m_phase = phase_degree / 180.0*M_PI; 
+		m_lfoRight.setPhase(m_phase);
 	};
 	void setLowCutForward(double cutoff)
 	{

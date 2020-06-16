@@ -210,9 +210,19 @@ void SimpleChorus::setMinDelay()
     m_nominalDelay_samples = int(m_nominalDelay * 0.001 * m_fs + 0.5);
     if (m_nominalDelay_samples <= 0)
         m_nominalDelay_samples = 1;
+	if (m_nominalDelay_samples >= m_absolutDelay_samples)
+		m_nominalDelay_samples = m_absolutDelay_samples - 1;
+
     m_width = (1.0 - m_lfoMinDelay / m_nominalDelay) * 100.0;
-    m_lfoLeft.setMin(m_lfoMinDelay * 0.001 * m_fs);
-    m_lfoRight.setMin(m_lfoMinDelay * 0.001 * m_fs);
+
+	int minDelay_Samples = m_lfoMinDelay * 0.001 * m_fs;
+	if (minDelay_Samples < 0)
+		minDelay_Samples = 0;
+	if (minDelay_Samples >= m_absolutDelay_samples)
+		minDelay_Samples = m_absolutDelay_samples;
+
+	m_lfoLeft.setMin(minDelay_Samples);
+    m_lfoRight.setMin(minDelay_Samples);
 }
 
 void SimpleChorus::setMaxDelay()
@@ -221,10 +231,19 @@ void SimpleChorus::setMaxDelay()
     m_nominalDelay_samples = int(m_nominalDelay * 0.001 * m_fs + 0.5);
     if (m_nominalDelay_samples <= 0)
         m_nominalDelay_samples = 1;
-    m_width = (1.0-m_lfoMinDelay/ m_nominalDelay)*100.0;
+	if (m_nominalDelay_samples >= m_absolutDelay_samples)
+		m_nominalDelay_samples = m_absolutDelay_samples - 1;
+	
+	m_width = (1.0 - m_lfoMinDelay / m_nominalDelay) * 100.0;
 
-    m_lfoLeft.setMax(m_lfoMaxDelay * 0.001 * m_fs);
-    m_lfoRight.setMax(m_lfoMaxDelay * 0.001 * m_fs);
+	int maxDelay_Samples = m_lfoMaxDelay * 0.001 * m_fs;
+	if (maxDelay_Samples < 0)
+		maxDelay_Samples = 0;
+	if (maxDelay_Samples >= m_absolutDelay_samples)
+		maxDelay_Samples = m_absolutDelay_samples;
+
+    m_lfoLeft.setMax(maxDelay_Samples);
+    m_lfoRight.setMax(maxDelay_Samples);
 }
 
 void SimpleChorus::computeSampleDelay()

@@ -1,7 +1,7 @@
 #include "LFO.h"
 
 LFO::LFO()
-	:m_freq(1.0),
+	:m_freq(0.25),
 	m_fs(1.0),
 	m_max(1.0),
 	m_min(1.0),
@@ -12,7 +12,7 @@ LFO::LFO()
 	m_slopeTime(0.0),
 	m_phase(0.0)
 {
-	m_lfoBasis = &m_lfotri;
+	m_lfoBasis = &m_lfosin;
 }
 
 LFO::~LFO()
@@ -65,24 +65,40 @@ void LFO::setAmplitude(double newAmplitude)
 
 void LFO::setFrequency(double frequency)
 {
+	if (frequency < 0.0)
+		frequency = 0.0;
+
+	if (frequency >= m_fs / 4)
+		frequency = m_fs / 4;
+	
 	m_freq = frequency;
 	m_lfoBasis->setFrequency(m_freq);
 }
 
 void LFO::setSamplerate(double samplerate)
 {
+	if (samplerate < 0.0)
+		samplerate = 1.0;
 	m_fs = samplerate;
 	m_lfoBasis->setSamplingrate(m_fs);
 }
 
 void LFO::setStartphase(double startPhase)
 {
+	if (startPhase < -3.1415)
+		startPhase = -3.1415;
+	if (startPhase > 2.0*3.1415)
+		startPhase = 0.0;
 	m_startphase = startPhase;
 	m_lfoBasis->setStartPhase(m_startphase);
 }
 
 void LFO::setPhase(double phase)
 {
+	if (phase < -3.1415)
+		phase = -3.1415;
+	if (phase > 2.0*3.1415)
+		phase = 0.0;
 	m_phase = phase;
 	m_lfoBasis->setPhase(m_phase);
 }

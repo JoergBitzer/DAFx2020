@@ -40,6 +40,7 @@ void LFOsin::setPhase(double phase)
 void LFOsin::reset()
 {
 	m_curPhase = m_startPhase;
+	
 }
 
 int LFOsin::getData(std::vector<double>& data)

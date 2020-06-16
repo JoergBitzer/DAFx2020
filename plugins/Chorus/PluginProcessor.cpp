@@ -24,6 +24,7 @@ SimpleChorusAudioProcessor::SimpleChorusAudioProcessor()
                        )
 #endif
 {
+	m_nrofbusses = 0;
 	m_lfoparams.addParameter(m_paramVector,0);
 	m_chorusparams.addParameter(m_paramVector);
 
@@ -163,7 +164,7 @@ void SimpleChorusAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
 	m_dataOutRight.resize(samplesPerBlock);
 	m_dataRight.resize(samplesPerBlock);
 
-	m_chorus.setRate(*m_rate);
+	//m_chorus.setRate(*m_rate);
 
 }
 
@@ -180,6 +181,14 @@ bool SimpleChorusAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
     ignoreUnused (layouts);
     return true;
   #else
+
+//	if (layouts.getMainInputChannelSet() == AudioChannelSet::disabled()
+//		|| layouts.getMainOutputChannelSet() == AudioChannelSet::disabled())
+//		return false;
+
+	auto lo = layouts.getMainOutputChannelSet();
+	auto li = layouts.getMainInputChannelSet();
+
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
@@ -191,14 +200,31 @@ bool SimpleChorusAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
    #endif
-
-    return true;
+	
+	auto numChannels = layouts.getMainInputChannels();
+	
+   return (numChannels > 0 && numChannels <= 2);;
   #endif
 }
 #endif
+void SimpleChorusAudioProcessor::numBusesChanged()
+{
+	m_nrofbusses = getBusCount(true);
 
+}
 void SimpleChorusAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
+	ScopedLock Sp(objectLock);
+
+	auto bypass = getBypassParameter();
+
+
+	if (buffer.getNumChannels() == 0)
+		return;
+
+	if (getBusCount(true) < 1)
+		return;
+
     ScopedNoDenormals noDenormals;
 	
 	if (*m_rate != m_oldrate)
