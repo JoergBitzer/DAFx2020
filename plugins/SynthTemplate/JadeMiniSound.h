@@ -1,12 +1,12 @@
 #pragma once
 
-#include <JuceHeader>
+#include <JuceHeader.h>
 
 
-class NanoSound : public SynthesiserSound
+class JadeMiniSound : public SynthesiserSound
 {
 public:
-    NanoSound() {};
+    JadeMiniSound() {};
     //==============================================================================
     /** Returns true if this sound should be played when a given midi note is pressed.
 
@@ -23,7 +23,7 @@ public:
     bool appliesToChannel(int midiChannel) { return true; };
 
 	// Params for Moog Ladder
-	std::atomic<float>* m_cutoff;
-	std::atomic<float>* m_reso;
+	//std::atomic<float>* m_cutoff;
+	//std::atomic<float>* m_reso;
 
 };

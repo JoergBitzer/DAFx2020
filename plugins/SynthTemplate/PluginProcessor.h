@@ -12,6 +12,9 @@
 
 #include <JuceHeader.h>
 #include <PresetHandler.h>
+#include "JadeMiniSound.h"
+#include "JadeMiniSynth.h"
+#include "JadeMiniVoice.h"
 
 //==============================================================================
 /**
@@ -65,6 +68,15 @@ private:
 
     PresetHandler m_presethandler;
     CriticalSection objectLock;
+
+    // Synth Voice Sound
+    static const int kNumberOfVoices = 16;
+    JadeMiniSynth m_synth;
+    JadeMiniSound* m_sound;
+
+    std::unique_ptr<JadeMiniSound> m_pSound;
+
+
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JadeMiniSynthAudioProcessor)
