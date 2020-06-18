@@ -5,11 +5,13 @@
     Created: 3 Jun 2020 11:35:05am
     Author:  bitzer
 
+	// Version 1.0.1 18.06.20 JB: color in save button changed to jadeGrey and JadeRed
+	// new dependency from JadeLookAndFeel
   ==============================================================================
 */
 
 #include "PresetHandler.h"
-
+#include "JadeLookAndFeel.h"
 PresetHandler::PresetHandler()
 	: Categories({"Unknown", "Lead", "Brass", "Template", "Bass",
 	"Keys", "Organ" , "Pad", "Drums_Perc", "SpecialEffect", "Strings" })
@@ -191,14 +193,18 @@ PresetComponent::PresetComponent(PresetHandler& ph)
 	:m_presetHandler(ph), m_somethingchanged(false), m_hidecategory(false)
 {
 	m_nextButton.setButtonText("Next");
+	m_nextButton.setColour(TextButton::ColourIds::buttonColourId,JadeGray);
 	m_nextButton.onClick = [this]() {nextButtonClick(); };
 	addAndMakeVisible(m_nextButton);
 
 	m_prevButton.setButtonText("Prev");
 	m_prevButton.onClick = [this]() {prevButtonClick(); };
+	m_prevButton.setColour(TextButton::ColourIds::buttonColourId, JadeGray);
 	addAndMakeVisible(m_prevButton);
 
 	m_saveButton.setButtonText("Save");
+	m_saveButton.setColour(TextButton::ColourIds::buttonColourId, JadeGray);
+
 	m_saveButton.onClick = [this]() {savePreset(); };
 	addAndMakeVisible(m_saveButton);
 
@@ -213,7 +219,7 @@ PresetComponent::PresetComponent(PresetHandler& ph)
 	m_presetCombo.setSelectedItemIndex(0, false);
 	m_presetCombo.isTextEditable();
 	m_presetCombo.setEditableText(true);
-
+	m_presetCombo.setColour(ComboBox::ColourIds::backgroundColourId, JadeGray);
 
 	addAndMakeVisible(m_presetCombo);
 
@@ -231,12 +237,13 @@ PresetComponent::PresetComponent(PresetHandler& ph)
 
 void PresetComponent::paint(Graphics & g)
 {
-	g.fillAll(Colours::darkgrey);
+	g.fillAll(JadeGray);
 	if (m_somethingchanged)
-		m_saveButton.setColour(TextButton::ColourIds::buttonColourId, Colours::red);
+		m_saveButton.setColour(TextButton::ColourIds::buttonColourId, JadeRed);
 	else
 	{
-		m_saveButton.setColour(TextButton::ColourIds::buttonColourId, getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
+		
+		m_saveButton.setColour(TextButton::ColourIds::buttonColourId, JadeGray);
 	}
 }
 #define COMBO_WITH 150
