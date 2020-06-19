@@ -31,6 +31,9 @@ WavetableOszi::WavetableOszi()
 	m_imag.resize(m_lenOfWavetable / 2 + 1);
 	m_newwave.resize(m_lenOfWavetable);
 	computeIncStep();
+	
+	m_tunecoarse = 0.0;
+	m_tunefine = 0.0;
 }
 
 WavetableOszi::~WavetableOszi()
@@ -67,7 +70,7 @@ int WavetableOszi::getData(std::vector<double>& data)
 		double out = (1.0 - fracpos) * *(pDataLow + pos) + fracpos * *(pDataLow + pos + 1);
 		double out2 = (1.0 - fracpos) * *(pDataSecond + pos) + fracpos * *(pDataSecond + pos + 1);
 
-		data[kk] = (1.0-m_waveformXFadeFactor) * out + m_waveformXFadeFactor*out2;
+		data[kk] = m_level*((1.0-m_waveformXFadeFactor) * out + m_waveformXFadeFactor*out2);
 
 		if (m_portamentoCounter > 0)
 		{
@@ -111,7 +114,12 @@ void WavetableOszi::setFrequency(double freq)
 
 void WavetableOszi::computeIncStep()
 {
-	m_incStep = m_freq / m_f0Table;
+	m_incStep = m_freq*m_tunefinal / m_f0Table;
+}
+void WavetableOszi::computeTuning()
+{
+	m_tunefinal = pow(2.0, (m_tunecoarse + m_tunefine * 0.01) / 12.0);
+	computeIncStep();
 }
 void WavetableOszi::setWaveform(int newwaveformnumber)
 {
@@ -144,6 +152,23 @@ void WavetableOszi::changeFrequencyRelative(double change_semitones)
 void WavetableOszi::setPortamentoTime(double portaTime_ms)
 {
 	m_portamentoTime_samples = static_cast<int>(portaTime_ms * 0.001 * m_fs);
+}
+
+void WavetableOszi::setLevel(double level_dB)
+{
+	m_level = pow(10.0,level_dB/20.0);
+}
+
+void WavetableOszi::setTuneCoarse(float semitones)
+{
+	m_tunecoarse = semitones;
+	computeTuning();
+}
+
+void WavetableOszi::setTuneFine(float cents)
+{
+	m_tunefine = cents;
+	computeTuning();
 }
 
 void WavetableOszi::computeFullWavetable()
@@ -193,4 +218,219 @@ void WavetableOszi::copyNewWavetable(std::vector<double> newwaveform,int nrWavef
 		m_wavetable[nrWaveform][nrWavetable][kk] = newwaveform[newwaveform.size() - m_interpolationOrder + kk];
 		m_wavetable[nrWaveform][nrWavetable][m_lenOfWavetable + m_interpolationOrder + kk] = newwaveform[kk];
 	}
+}
+
+int OscParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParameter>>& paramVector, int instance)
+{
+	if (instance < MAX_OSC_INSTANCES)
+	{
+		StringArray choiceNames(paramOscWaveform1.Choices);
+
+		paramVector.push_back(std::make_unique<AudioParameterChoice>(paramOscWaveform1.ID[instance],
+			paramOscWaveform1.name,
+			choiceNames,
+			paramOscWaveform1.defaultIndex,
+			paramOscWaveform1.unitName));
+
+		paramVector.push_back(std::make_unique<AudioParameterChoice>(paramOscWaveform2.ID[instance],
+			paramOscWaveform2.name,
+			choiceNames,
+			paramOscWaveform2.defaultIndex,
+			paramOscWaveform2.unitName));
+
+
+		paramVector.push_back(std::make_unique<AudioParameterFloat>(paramOscTuneCoarse.ID[instance],
+			paramOscTuneCoarse.name,
+			NormalisableRange<float>(paramOscTuneCoarse.minValue, paramOscTuneCoarse.maxValue),
+			paramOscTuneCoarse.defaultValue,
+			paramOscTuneCoarse.unitName,
+			AudioProcessorParameter::genericParameter,
+			[](float value, int MaxLen) { return (String(float(int(value + 0.5)), MaxLen) + " semi"); },
+			[](const String& text) {return text.getFloatValue(); }));
+
+		paramVector.push_back(std::make_unique<AudioParameterFloat>(paramOscTuneFine.ID[instance],
+			paramOscTuneFine.name,
+			NormalisableRange<float>(paramOscTuneFine.minValue, paramOscTuneFine.maxValue),
+			paramOscTuneFine.defaultValue,
+			paramOscTuneFine.unitName,
+			AudioProcessorParameter::genericParameter,
+			[](float value, int MaxLen) { return (String((0.1 * int(value * 10 + 0.5)), MaxLen) + " cent"); },
+			[](const String& text) {return text.getFloatValue(); }));
+
+		paramVector.push_back(std::make_unique<AudioParameterFloat>(paramOscXFade.ID[instance],
+			paramOscXFade.name,
+			NormalisableRange<float>(paramOscXFade.minValue, paramOscXFade.maxValue),
+			paramOscXFade.defaultValue,
+			paramOscXFade.unitName,
+			AudioProcessorParameter::genericParameter,
+			[](float value, int MaxLen) { return (String((0.1 * int(value * 10 + 0.5)), MaxLen) + " %"); },
+			[](const String& text) {return text.getFloatValue(); }));
+
+		paramVector.push_back(std::make_unique<AudioParameterFloat>(paramOscLevel.ID[instance],
+			paramOscLevel.name,
+			NormalisableRange<float>(paramOscLevel.minValue, paramOscLevel.maxValue),
+			paramOscLevel.defaultValue,
+			paramOscLevel.unitName,
+			AudioProcessorParameter::genericParameter,
+			[](float value, int MaxLen) { return (String((0.1 * int(value * 10 + 0.5)), MaxLen) + " dB"); },
+			[](const String& text) {return text.getFloatValue(); }));
+
+		paramVector.push_back(std::make_unique<AudioParameterFloat>(paramOscModDepth.ID[instance],
+			paramOscModDepth.name,
+			NormalisableRange<float>(paramOscModDepth.minValue, paramOscModDepth.maxValue),
+			paramOscModDepth.defaultValue,
+			paramOscModDepth.unitName,
+			AudioProcessorParameter::genericParameter,
+			[](float value, int MaxLen) { return (String((0.1 * int(value * 10 + 0.5)), MaxLen)); },
+			[](const String& text) {return  text.getFloatValue(); }));
+
+	}
+	return 0;
+}
+
+OscParameterComponent::OscParameterComponent(AudioProcessorValueTreeState& vts, int index, const String& oscName)
+	:m_vts(vts), somethingChanged(nullptr), m_name(oscName),m_index(index)
+{
+
+	// Waveform
+
+	m_osc1waveform1Label.setText("Waveform 1", NotificationType::dontSendNotification);
+	m_osc1waveform1Label.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_osc1waveform1Label);
+
+	StringArray WaveformNames(paramOscWaveform1.Choices);
+	m_osc1waveform1Combo.addItemList(WaveformNames, 1);
+	m_osc1waveform1Combo.setSelectedItemIndex(0, false);
+	m_osc1waveform1Combo.setJustificationType(Justification::centred);
+	m_osc1waveform1Combo.onChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+	addAndMakeVisible(m_osc1waveform1Combo);
+	m_osc1waveform1Attachment = std::make_unique<ComboAttachment>(m_vts, paramOscWaveform1.ID[m_index], m_osc1waveform1Combo);
+
+
+	m_osc1waveform2Label.setText("Waveform 2", NotificationType::dontSendNotification);
+	m_osc1waveform2Label.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_osc1waveform2Label);
+
+	//StringArray WaveformNames(paramOscWaveform1.Choices);
+	m_osc1waveform2Combo.addItemList(WaveformNames, 1);
+	m_osc1waveform2Combo.setSelectedItemIndex(0, false);
+	m_osc1waveform2Combo.setJustificationType(Justification::centred);
+	m_osc1waveform2Combo.onChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+	addAndMakeVisible(m_osc1waveform2Combo);
+	m_osc1waveform2Attachment = std::make_unique<ComboAttachment>(m_vts, paramOscWaveform2.ID[m_index], m_osc1waveform2Combo);
+
+
+	// XFAde
+	m_osc1xfadeLabel.setText("Mix", NotificationType::dontSendNotification);
+	m_osc1xfadeLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_osc1xfadeLabel);
+	
+	m_osc1xfadeSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_osc1xfadeSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+	m_osc1xfadeAttachment = std::make_unique<SliderAttachment>(m_vts, paramOscXFade.ID[m_index], m_osc1xfadeSlider);
+	addAndMakeVisible(m_osc1xfadeSlider);
+	m_osc1xfadeSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+	
+	// tune
+	m_osc1tunecoarseLabel.setText("Coarse", NotificationType::dontSendNotification);
+	m_osc1tunecoarseLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_osc1tunecoarseLabel);
+
+	m_osc1tunecoarseSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_osc1tunecoarseSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 45, 20);
+	m_osc1tunecoarseAttachment = std::make_unique<SliderAttachment>(m_vts, paramOscTuneCoarse.ID[m_index], m_osc1tunecoarseSlider);
+	addAndMakeVisible(m_osc1tunecoarseSlider);
+	m_osc1tunecoarseSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_osc1tunefineLabel.setText("Fine", NotificationType::dontSendNotification);
+	m_osc1tunefineLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_osc1tunefineLabel);
+
+	m_osc1tunefineSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_osc1tunefineSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 45, 20);
+	m_osc1tunefineAttachment = std::make_unique<SliderAttachment>(m_vts, paramOscTuneFine.ID[m_index], m_osc1tunefineSlider);
+	addAndMakeVisible(m_osc1tunefineSlider);
+	m_osc1tunefineSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_osc1levelLabel.setText("Level", NotificationType::dontSendNotification);
+	m_osc1levelLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_osc1levelLabel);
+
+	m_osc1levelSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_osc1levelSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 45, 20);
+	m_osc1levelAttachment = std::make_unique<SliderAttachment>(m_vts, paramOscLevel.ID[m_index], m_osc1levelSlider);
+	addAndMakeVisible(m_osc1levelSlider);
+	m_osc1levelSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+}
+
+void OscParameterComponent::paint(Graphics& g)
+{
+	g.fillAll((getLookAndFeel().findColour(ResizableWindow::backgroundColourId)).darker(0.1));
+}
+
+#define OSC_LABEL_WIDTH 90
+#define OSC_COMBO_WIDTH 90
+#define OSC_COMBO_HEIGHT 30
+#define OSC_ROTARY_WIDTH 60
+#define OSC_SMALLROTARY_WIDTH 45
+#define OSC_MIN_DISTANCE 5
+void OscParameterComponent::resized()
+{
+	auto r = getLocalBounds();
+	r.removeFromLeft(OSC_MIN_DISTANCE);
+	r.removeFromTop(OSC_MIN_DISTANCE);
+	auto s = r;
+	s.removeFromBottom(getHeight()-OSC_COMBO_HEIGHT);
+	m_osc1waveform1Label.setBounds(s.removeFromLeft(OSC_LABEL_WIDTH));
+
+	// label xfade
+	s.removeFromLeft(OSC_MIN_DISTANCE);
+	m_osc1xfadeLabel.setBounds(s.removeFromLeft(OSC_ROTARY_WIDTH));
+
+	// label waveform2
+	s.removeFromLeft(OSC_MIN_DISTANCE);
+	m_osc1waveform2Label.setBounds(s.removeFromLeft(OSC_LABEL_WIDTH));
+
+
+	s = r;
+	s.removeFromTop(OSC_COMBO_HEIGHT);
+	s.removeFromBottom(getHeight() - 2*OSC_COMBO_HEIGHT); // hoehe der Reihe
+	m_osc1waveform1Combo.setBounds(s.removeFromLeft(OSC_COMBO_WIDTH));
+	
+	s = r;
+	s.removeFromTop(OSC_COMBO_HEIGHT);
+	s.removeFromBottom(getHeight() - 3 * OSC_COMBO_HEIGHT);
+	s.removeFromLeft(OSC_MIN_DISTANCE + OSC_COMBO_WIDTH);
+	m_osc1xfadeSlider.setBounds(s.removeFromLeft(OSC_ROTARY_WIDTH));
+
+	s = r;
+	s.removeFromTop(OSC_COMBO_HEIGHT);
+	s.removeFromBottom(getHeight() - 2 * OSC_COMBO_HEIGHT);
+	s.removeFromLeft(2* OSC_MIN_DISTANCE + OSC_COMBO_WIDTH + OSC_ROTARY_WIDTH);
+	m_osc1waveform2Combo.setBounds(s.removeFromLeft(OSC_COMBO_WIDTH));
+
+
+// second row
+	s = r;
+	s.removeFromTop(2*OSC_COMBO_HEIGHT + 2 * OSC_MIN_DISTANCE);
+	s.removeFromBottom(getHeight() -  3*OSC_COMBO_HEIGHT);
+	m_osc1tunecoarseLabel.setBounds(s.removeFromLeft(OSC_SMALLROTARY_WIDTH));
+	//s.removeFromLeft(OSC_MIN_DISTANCE);
+	m_osc1tunefineLabel.setBounds(s.removeFromLeft(OSC_SMALLROTARY_WIDTH));
+	s.removeFromRight(OSC_MIN_DISTANCE);
+	m_osc1levelLabel.setBounds(s.removeFromRight(OSC_SMALLROTARY_WIDTH));
+
+
+	s = r;
+	auto DistTop = 3 * OSC_COMBO_HEIGHT ;
+	s.removeFromTop(DistTop);
+	s.removeFromBottom(getHeight() - DistTop - 2*OSC_COMBO_HEIGHT );
+	m_osc1tunecoarseSlider.setBounds(s.removeFromLeft(OSC_SMALLROTARY_WIDTH));
+
+	m_osc1tunefineSlider.setBounds(s.removeFromLeft(OSC_SMALLROTARY_WIDTH));
+
+	s.removeFromRight(OSC_MIN_DISTANCE);
+	m_osc1levelSlider.setBounds(s.removeFromRight(OSC_SMALLROTARY_WIDTH));
+	
 }
