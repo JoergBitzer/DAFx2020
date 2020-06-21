@@ -90,8 +90,8 @@ void BasicWaveforms::computeRectPulse()
 		double a_n;
 		if (hh == 0)
 		{
-			a_n = m_dutyCycle;
-			Lanczossigma = 1;
+			//a_n = m_dutyCycle;
+			//Lanczossigma = 1;
 		}
 		else
 		{

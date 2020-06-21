@@ -3,7 +3,10 @@
 MoogLadder::MoogLadder()
 	:m_fs(44100.f),
 	m_cutoff(1000.f),
-	m_resonance(0.f)
+	m_resonance(0.f),
+	m_modKeyboard(1.0),
+	m_modKeyboardFactor(1.0),
+	m_currNote(1)
 {
 	reset();
 	changeParameter();
@@ -43,6 +46,16 @@ int MoogLadder::processData(std::vector<double>& in, std::vector<double>& out)
 	return 0;
 }
 
+void MoogLadder::setMidiNote(int midinote)
+{
+	m_currNote = midinote;
+	const int midia0 = 57;
+	int distanceInSemitones = midinote - midia0;
+
+	m_modKeyboardFactor = pow(2.0, m_modKeyboard*double(distanceInSemitones) / 12.0);
+	changeParameter();
+}
+
 void MoogLadder::reset()
 {
 	m_state1 = 0.0;
@@ -52,8 +65,10 @@ void MoogLadder::reset()
 }
 
 void MoogLadder::changeParameter()
+
 {
-	double g = tan(M_PI * m_cutoff / m_fs);
+	double cutoff = checkRange(m_cutoff * m_modKeyboardFactor);
+	double g = tan(M_PI * cutoff / m_fs);
 	m_alpha = g / (1.0 + g);
 	m_alpha_0 = 1.0 / (1.0 + m_resonance * m_alpha * m_alpha * m_alpha * m_alpha);
 	m_beta4 = 1.0 / (1.0 + g);
@@ -61,7 +76,7 @@ void MoogLadder::changeParameter()
 	m_beta2 = m_alpha * m_alpha / (1.0 + g);
 	m_beta1 = m_alpha * m_alpha * m_alpha / (1.0 + g);
 }
-#ifdef JUCE
+#ifdef USE_JUCE
 
 int MoogLadderParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParameter>>& paramVector)
 {
@@ -82,8 +97,34 @@ int MoogLadderParameter::addParameter(std::vector<std::unique_ptr<RangedAudioPar
 		AudioProcessorParameter::genericParameter,
 		[](float value, int MaxLen) {return String(value, MaxLen); },
 		[](const String& text)	{ return text.getFloatValue();}));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramModKeyboard.ID,
+		paramModKeyboard.name,
+		NormalisableRange<float>(paramModKeyboard.minValue, paramModKeyboard.maxValue),
+		paramModKeyboard.defaultValue,
+		paramModKeyboard.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) {return String(value, MaxLen); },
+		[](const String& text) { return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramModEnvelope.ID,
+		paramModEnvelope.name,
+		NormalisableRange<float>(paramModEnvelope.minValue, paramModEnvelope.maxValue),
+		paramModEnvelope.defaultValue,
+		paramModEnvelope.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) {return String(value, MaxLen); },
+		[](const String& text) { return text.getFloatValue(); }));
 	
-	
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramModLfo.ID,
+		paramModLfo.name,
+		NormalisableRange<float>(paramModLfo.minValue, paramModLfo.maxValue),
+		paramModLfo.defaultValue,
+		paramModLfo.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) {return String(value, MaxLen); },
+		[](const String& text) { return text.getFloatValue(); }));
+
 	return 0;
 }
 #endif

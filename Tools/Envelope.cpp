@@ -206,7 +206,7 @@ int EnvelopeParameter::addParameter(std::vector < std::unique_ptr<RangedAudioPar
 }
 
 EnvelopeParameterComponent::EnvelopeParameterComponent(AudioProcessorValueTreeState& vts, int index, const String& envName)
-	:m_vts(vts), somethingChanged(nullptr), m_name(envName), m_index(index),m_style(EnvelopeStyle::horizontal)
+	:m_vts(vts), somethingChanged(nullptr), m_name(envName), m_index(index),m_style(EnvelopeStyle::horizontal), m_showdelay(false)
 {
 
 	m_EnvDelayLabel.setText("Delay", NotificationType::dontSendNotification);
@@ -295,9 +295,11 @@ void EnvelopeParameterComponent::resized()
 		break;
 	case EnvelopeStyle::horizontal:
 		s = r.removeFromTop(ENV_LABEL_HEIGHT);
-
-		m_EnvDelayLabel.setBounds(s.removeFromLeft(ENV_LABEL_WIDTH));
-		s.removeFromLeft(ENV_MIN_DISTANCE);
+		if (m_showdelay)
+		{
+			m_EnvDelayLabel.setBounds(s.removeFromLeft(ENV_LABEL_WIDTH));
+			s.removeFromLeft(ENV_MIN_DISTANCE);
+		}
 		m_EnvAttackLabel.setBounds(s.removeFromLeft(ENV_LABEL_WIDTH));
 		s.removeFromLeft(ENV_MIN_DISTANCE);
 		m_EnvHoldLabel.setBounds(s.removeFromLeft(ENV_LABEL_WIDTH));
@@ -310,8 +312,11 @@ void EnvelopeParameterComponent::resized()
 
 		s = r;
 		t = s.removeFromBottom(ENV_ROTARY_WIDTH);
-		m_EnvDelaySlider.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH));
-		t.removeFromLeft(ENV_MIN_DISTANCE);
+		if (m_showdelay)
+		{
+			m_EnvDelaySlider.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH));
+			t.removeFromLeft(ENV_MIN_DISTANCE);
+		}
 		m_EnvAttackSlider.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH));
 		t.removeFromLeft(ENV_MIN_DISTANCE);
 		m_EnvHoldSlider.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH));

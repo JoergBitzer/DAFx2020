@@ -14,7 +14,11 @@ public:
 	void setResonance(double resonance) { m_resonance = resonance; changeParameter(); };
 	void setCutoffFrequency(double cutoff) { m_cutoff = cutoff; changeParameter(); };
 	void setSamplerate(double samplerate) { m_fs = samplerate; changeParameter(); };
+	void setKeyboardModulation(double modValue) { m_modKeyboard = modValue; setMidiNote(m_currNote); };
+	void setMidiNote(int midinote);
+
 	void reset();
+
 
 private:
 	double m_fs;
@@ -27,9 +31,22 @@ private:
 	double m_state1, m_state2, m_state3, m_state4;
 
 	void changeParameter();
+	// Modulation
+	int m_currNote;
+	double m_modKeyboard;
+	double m_modKeyboardFactor;
+	inline double checkRange(float value)
+	{
+		if (value < 1.0)
+			return 1.0;
+		
+		if (value >= 0.9 * m_fs / 2)
+			return 0.9 * m_fs / 2;
+		return value;
+	}
 };
 
-#ifdef JUCE
+#ifdef USE_JUCE
 #include <JuceHeader.h>
 const struct
 {
@@ -51,6 +68,37 @@ const struct
 	float defaultValue = 2.f;
 }paramResonance;
 
+const struct
+{
+	std::string ID = "KeyboardMod";
+	std::string name = "Modulation Keyboard";
+	std::string unitName = "";
+	float minValue = -1.0f;
+	float maxValue = 1.f;
+	float defaultValue = 1.f;
+}paramModKeyboard;
+
+const struct
+{
+	std::string ID = "EnvelopeMod";
+	std::string name = "Modulation Envelope";
+	std::string unitName = "";
+	float minValue = -1.0f;
+	float maxValue = 1.f;
+	float defaultValue = 1.f;
+}paramModEnvelope;
+
+const struct
+{
+	std::string ID = "LfoMod";
+	std::string name = "Modulation LFO";
+	std::string unitName = "";
+	float minValue = -1.0f;
+	float maxValue = 1.f;
+	float defaultValue = 1.f;
+}paramModLfo;
+
+
 class MoogLadderParameter
 {
 public:
@@ -58,5 +106,7 @@ public:
 
 	int addParameter(std::vector < std::unique_ptr<RangedAudioParameter>>& paramVector);
 };
+
+
 
 #endif

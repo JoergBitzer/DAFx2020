@@ -162,12 +162,13 @@ public:
 	void resized() override;
 	std::function<void()> somethingChanged;
 	void setStyle(EnvelopeStyle style) { m_style = style; };
-
+	void setShowDelay() { m_showdelay = true; };
 private:
 	AudioProcessorValueTreeState& m_vts;
 	int m_index;
 	String m_name;
 	EnvelopeStyle m_style;
+	bool m_showdelay;
 
 	Label m_EnvAttackLabel;
 	Slider m_EnvAttackSlider;
