@@ -25,9 +25,10 @@ void BasicWaveforms::getWavetable(std::vector<double>& wavetable, waveforms wave
 		break;
 	case waveforms::tri:
 		computeTriangle();
-
+		break;
 	case waveforms::rectPulse:
 		computeRectPulse();
+		break;
 	}
 	std::copy(m_waveform.begin(), m_waveform.end(), wavetable.begin());
 }
@@ -70,7 +71,7 @@ void BasicWaveforms::computeTriangle()
 			m_waveform[kk] += Lanczossigma * 8.0 / (M_PI*M_PI * hh *hh) * pow(-1.0,0.5*double(hh-1)) * sin(2.0 * M_PI * hh * kk / m_len);
 		}
 	}
-}
+}	
 
 /**
  * This method computes the basic waveform for a periodic pulse. The duty cicle

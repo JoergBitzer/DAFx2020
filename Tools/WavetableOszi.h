@@ -111,7 +111,7 @@ const struct
 	const std::string ID[MAX_OSC_INSTANCES] = { "Osc1Waveform1", "Osc2Waveform1", "Osc3Waveform1", "Osc4Waveform1" };
 	std::string name = "Waveform1";
 	std::string unitName = "";
-	const char* Choices[4] = { "rectangular","sawtooth","triangle"};
+	const char* Choices[4] = { "sawtooth","rectangular","triangle"};
 	int defaultIndex = 0;
 }paramOscWaveform1;
 const struct
@@ -119,8 +119,8 @@ const struct
 	const std::string ID[MAX_OSC_INSTANCES] = { "Osc1Waveform2", "Osc2Waveform2", "Osc3Waveform2", "Osc4Waveform2" };
 	std::string name = "Waveform2";
 	std::string unitName = "";
-	const char* Choices[4] = { "rectangular","sawtooth","triangle" };
-	int defaultIndex = 0;
+	const char* Choices[4] = { "sawtooth","rectangular","triangle" };
+	int defaultIndex = 1;
 }paramOscWaveform2;
 
 
