@@ -127,4 +127,85 @@ int MoogLadderParameter::addParameter(std::vector<std::unique_ptr<RangedAudioPar
 
 	return 0;
 }
+
+MoogLadderParameterComponent::MoogLadderParameterComponent(AudioProcessorValueTreeState& vts)
+	:m_vts(vts), somethingChanged(nullptr), m_style(ComponentStyle::horizontal)
+{
+	m_CutoffLabel.setText("Cutoff", NotificationType::dontSendNotification);
+	m_CutoffLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_CutoffLabel);
+
+	m_CutoffSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_CutoffSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+	m_CutoffAttachment = std::make_unique<SliderAttachment>(m_vts, paramCutoff.ID, m_CutoffSlider);
+	addAndMakeVisible(m_CutoffSlider);
+	m_CutoffSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+
+	m_ResonanceLabel.setText("Resonance", NotificationType::dontSendNotification);
+	m_ResonanceLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_ResonanceLabel);
+
+	m_ResonanceSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_ResonanceSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+	m_ResonanceAttachment = std::make_unique<SliderAttachment>(m_vts, paramResonance.ID, m_ResonanceSlider);
+	addAndMakeVisible(m_ResonanceSlider);
+	m_ResonanceSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_ModKeyboardLabel.setText("ModKeyboard", NotificationType::dontSendNotification);
+	m_ModKeyboardLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_ModKeyboardLabel);
+
+	m_ModKeyboardSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_ModKeyboardSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+	m_ModKeyboardAttachment = std::make_unique<SliderAttachment>(m_vts, paramModKeyboard.ID, m_ModKeyboardSlider);
+	addAndMakeVisible(m_ModKeyboardSlider);
+	m_ModKeyboardSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+}
+
+void MoogLadderParameterComponent::paint(Graphics& g)
+{
+	g.fillAll((getLookAndFeel().findColour(ResizableWindow::backgroundColourId)).darker(0.2));
+
+}
+#define MOOG_LABEL_WIDTH 60
+#define MOOG_ROTARY_WIDTH 60
+#define MOOG_MIN_DISTANCE 5
+#define MOOG_LABEL_HEIGHT 20
+
+void MoogLadderParameterComponent::resized()
+{
+	auto r = getLocalBounds();
+	r.reduce(MOOG_MIN_DISTANCE, MOOG_MIN_DISTANCE);
+	auto s = r;
+	auto t = r;
+	switch (m_style)
+	{
+	case ComponentStyle::compact:
+
+		break;
+	case ComponentStyle::horizontal:
+		s = r.removeFromTop(MOOG_LABEL_HEIGHT);
+		m_CutoffLabel.setBounds(s.removeFromLeft(MOOG_LABEL_WIDTH));
+		s.removeFromLeft(MOOG_MIN_DISTANCE);
+		m_ResonanceLabel.setBounds(s.removeFromLeft(MOOG_LABEL_WIDTH));
+		s.removeFromLeft(MOOG_MIN_DISTANCE);
+		m_ModKeyboardLabel.setBounds(s.removeFromLeft(MOOG_LABEL_WIDTH));
+
+		s = r;
+		t = s.removeFromBottom(MOOG_ROTARY_WIDTH);
+		m_CutoffSlider.setBounds(t.removeFromLeft(MOOG_ROTARY_WIDTH));
+		t.removeFromLeft(MOOG_MIN_DISTANCE);
+		m_ResonanceSlider.setBounds(t.removeFromLeft(MOOG_ROTARY_WIDTH));
+		t.removeFromLeft(MOOG_MIN_DISTANCE);
+		m_ModKeyboardSlider.setBounds(t.removeFromLeft(MOOG_ROTARY_WIDTH));
+
+		break;
+	case ComponentStyle::vertical:
+
+		break;
+	}
+
+}
 #endif

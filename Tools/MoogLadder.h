@@ -109,4 +109,43 @@ public:
 
 
 
+typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboAttachment;
+
+class MoogLadderParameterComponent : public Component
+{
+public:
+	enum class ComponentStyle
+	{
+		compact,
+		horizontal,
+		vertical
+	};
+	MoogLadderParameterComponent(AudioProcessorValueTreeState&);
+
+	void paint(Graphics& g) override;
+	void resized() override;
+	std::function<void()> somethingChanged;
+	void setStyle(ComponentStyle style) { m_style = style; };
+
+private:
+	AudioProcessorValueTreeState& m_vts;
+	ComponentStyle m_style;
+
+	Label m_CutoffLabel;
+	Slider m_CutoffSlider;
+	std::unique_ptr<SliderAttachment> m_CutoffAttachment;
+
+	Label m_ResonanceLabel;
+	Slider m_ResonanceSlider;
+	std::unique_ptr<SliderAttachment> m_ResonanceAttachment;
+
+	Label m_ModKeyboardLabel;
+	Slider m_ModKeyboardSlider;
+	std::unique_ptr<SliderAttachment> m_ModKeyboardAttachment;
+
+};
+
+
+
 #endif
