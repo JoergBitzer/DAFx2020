@@ -7,6 +7,8 @@ WhiteNoiseGenerator::WhiteNoiseGenerator()
 	std::random_device rd;
 	m_mt = std::mt19937(rd());
 	m_dist = std::uniform_real_distribution<double>(-M_PI*0.5, M_PI*0.5);
+	
+
 }
 
 WhiteNoiseGenerator::~WhiteNoiseGenerator()
@@ -17,8 +19,7 @@ int WhiteNoiseGenerator::getData(std::vector<double>& data)
 {
 	for (unsigned int kk = 0; kk < data.size(); kk++)
 	{
-		double noise = m_dist(m_mt); 
-		data.at(kk) = m_normalize * m_amplitude * tan(noise * m_grainFactor);
+		data.at(kk) = getOneWhiteSample();
 	}
 	return 0;
 }

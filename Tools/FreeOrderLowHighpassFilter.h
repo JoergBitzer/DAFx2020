@@ -10,7 +10,7 @@
 -------------------------------------------------------*/
 /*ToDO:
 1.) SOS Seperation using roots (see https://en.wikipedia.org/wiki/Companion_matrix)
-    the comlex roots are the eigenvalues of the Campanionmatrix of the polynomial
+    the complex roots are the eigenvalues of the Companionmatrix of the polynomial
 */
 
 #pragma once
