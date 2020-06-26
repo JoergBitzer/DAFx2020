@@ -70,11 +70,23 @@ void DebugAudioWriterAudioProcessorEditor::saveAudio()
 
 	auto ms = tt.toMilliseconds();
 	String  dirname= "c:\\temp\\";
+	File myFolder(dirname);
+	if (myFolder.isDirectory() == false)
+	{
+		bool b = myFolder.createDirectory();
+		if (b == false)
+			return;
+	}
+
 	auto outfilename = String(dirname + String(ms) + ".wav");
 	File outfile(outfilename);
+
 	auto fileStream = std::unique_ptr<FileOutputStream>(outfile.createOutputStream());
+	if (fileStream == nullptr)
+		return;
+
 	WavAudioFormat wavFormat;
-	
+		
 	AudioFormatWriter *writer;
 	if (processor.m_nrofchans == 1)
 		writer = wavFormat.createWriterFor(fileStream.get(), processor.m_fs, 1, 16, {}, 0);
