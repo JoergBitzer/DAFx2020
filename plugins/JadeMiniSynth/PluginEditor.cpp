@@ -15,7 +15,7 @@
 JadeMiniSynthAudioProcessorEditor::JadeMiniSynthAudioProcessorEditor(JadeMiniSynthAudioProcessor& p, AudioProcessorValueTreeState& vts, PresetHandler& ph)
     : AudioProcessorEditor(&p), m_processor(p), m_vts(vts), m_presetGUI(ph), m_keyboard(p.m_keyboardState, 
         MidiKeyboardComponent::Orientation::horizontalKeyboard),
-    m_osc1(vts,0,"Osc1"),m_env1(vts,0,"EnvelopeVCA")
+    m_osc1(vts,0,"Osc1"),m_env1(vts,0,"EnvelopeVCA"),m_moogladder(vts),m_noise(vts)
 {
     ScopedLock sp();
     addAndMakeVisible(m_presetGUI);
@@ -26,6 +26,12 @@ JadeMiniSynthAudioProcessorEditor::JadeMiniSynthAudioProcessorEditor(JadeMiniSyn
 
     addAndMakeVisible(m_env1);
     m_env1.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
+
+    addAndMakeVisible(m_moogladder);
+    m_moogladder.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
+
+    addAndMakeVisible(m_noise);
+    m_noise.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -53,6 +59,13 @@ void JadeMiniSynthAudioProcessorEditor::paint (Graphics& g)
 #define ENV_WIDTH_HORZ 330
 #define PLUGIN_MIN_DISTANCE 5
 
+#define MOOG_HEIGHT_HORZ 90
+#define MOOG_WIDTH_HORZ 195
+
+#define NOISE_HEIGHT_HORZ 90
+#define NOISE_WIDTH_HORZ 250
+
+
 void JadeMiniSynthAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
@@ -71,5 +84,9 @@ void JadeMiniSynthAudioProcessorEditor::resized()
 //    s = rinner.removeFromLeft(OSC_WIDTH + PLUGIN_MIN_DISTANCE);
     m_env1.setBounds(s.removeFromLeft(ENV_WIDTH_HORZ));
 
+    m_moogladder.setBounds(r.getWidth() / 2 - MOOG_WIDTH_HORZ / 2, r.getHeight() / 2 - MOOG_HEIGHT_HORZ / 2, MOOG_WIDTH_HORZ, MOOG_HEIGHT_HORZ);
+
+    rinner = r;
+    m_noise.setBounds((rinner.removeFromBottom(NOISE_HEIGHT_HORZ)).removeFromLeft(NOISE_WIDTH_HORZ));
 
 }

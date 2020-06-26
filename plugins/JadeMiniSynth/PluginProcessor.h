@@ -19,6 +19,9 @@
 #include "Envelope.h"
 #include "MoogLadder.h"
 
+#include "WhiteNoiseGenerator.h"
+#include "ColoredNoiseGenerator.h"
+
 //==============================================================================
 /**
 */
@@ -85,6 +88,8 @@ private:
     EnvelopeParameter m_envParam;
     MoogLadderParameter m_moogParam;
 
+    WhiteNoiseParameter m_whitenoiseParam;
+    ColoredNoiseParameter m_colorednoiseParam;
 
 
     //==============================================================================

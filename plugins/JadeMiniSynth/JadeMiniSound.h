@@ -47,5 +47,13 @@ public:
     std::atomic<float>* m_modEnvelope;
     std::atomic<float>* m_modLfo;
 
+    // Params for Noise Gen
+    std::atomic<float>* m_whiteLevel;
+    std::atomic<float>* m_whiteGraininess;
+    std::atomic<float>* m_coloredLow;
+    std::atomic<float>* m_coloredHigh;
+
+
+
 
 };

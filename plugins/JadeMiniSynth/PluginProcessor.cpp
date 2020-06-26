@@ -29,6 +29,8 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     m_envParam.addParameter(m_paramVector, 0);
     m_moogParam.addParameter(m_paramVector);
 
+    m_whitenoiseParam.addParameter(m_paramVector);
+    m_colorednoiseParam.addParameter(m_paramVector);
 
     // Build VTS and PresetHandler
     m_parameterVTS = std::make_unique<AudioProcessorValueTreeState>(*this, nullptr, Identifier("SimpleChorusVTS"),
@@ -47,6 +49,7 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     //m_synth.addSound(*m_pSound);
     m_synth.addSound(m_sound);
 
+    // Osc1 
     m_sound->m_osc1wave1 = m_parameterVTS->getRawParameterValue(paramOscWaveform1.ID[0]);
     m_sound->m_osc1wave2 = m_parameterVTS->getRawParameterValue(paramOscWaveform2.ID[0]);
     m_sound->m_osc1moddepth = m_parameterVTS->getRawParameterValue(paramOscModDepth.ID[0]);
@@ -55,7 +58,7 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     m_sound->m_osc1tunecoarse = m_parameterVTS->getRawParameterValue(paramOscTuneCoarse.ID[0]);
     m_sound->m_osc1tunefine = m_parameterVTS->getRawParameterValue(paramOscTuneFine.ID[0]);
 
-    // ENvelope
+    // ENvelope 1 (VCA)
     m_sound->m_env1Delay = m_parameterVTS->getRawParameterValue(paramEnvDelay.ID[0]);
     m_sound->m_env1Attack = m_parameterVTS->getRawParameterValue(paramEnvAttack.ID[0]);
     m_sound->m_env1Hold = m_parameterVTS->getRawParameterValue(paramEnvHold.ID[0]);
@@ -69,6 +72,13 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     m_sound->m_modKeyboard = m_parameterVTS->getRawParameterValue(paramModKeyboard.ID);
     m_sound->m_modEnvelope = m_parameterVTS->getRawParameterValue(paramModEnvelope.ID);
     m_sound->m_modLfo = m_parameterVTS->getRawParameterValue(paramModLfo.ID);
+
+    // Noise Source
+    m_sound->m_whiteLevel = m_parameterVTS->getRawParameterValue(paramNoiseLevel.ID);
+    m_sound->m_whiteGraininess = m_parameterVTS->getRawParameterValue(paramNoiseGraininess.ID);
+    m_sound->m_coloredLow = m_parameterVTS->getRawParameterValue(paramNoiseColorLow.ID);
+    m_sound->m_coloredHigh = m_parameterVTS->getRawParameterValue(paramNoiseColorHigh.ID);
+
 
 }
 

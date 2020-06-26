@@ -64,6 +64,7 @@ protected:
 };
 
 #ifdef USE_JUCE
+#include <JuceHeader.h>
 
 const struct
 {
@@ -84,6 +85,56 @@ const struct
 	float maxValue = 3.f;
 	float defaultValue = 0.25f;
 }paramNoiseColorHigh;
+
+class ColoredNoiseParameter
+{
+public:
+	// Lowpass
+
+	int addParameter(std::vector < std::unique_ptr<RangedAudioParameter>>& paramVector);
+};
+
+
+typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboAttachment;
+
+class ColoredNoiseComponent : public Component
+{
+public:
+	enum class ComponentStyle
+	{
+		compact,
+		horizontal,
+		vertical
+	};
+	ColoredNoiseComponent(AudioProcessorValueTreeState&);
+
+	void paint(Graphics& g) override;
+	void resized() override;
+	std::function<void()> somethingChanged;
+	void setStyle(ComponentStyle style) { m_style = style; };
+
+private:
+	AudioProcessorValueTreeState& m_vts;
+	ComponentStyle m_style;
+
+	Label m_NoiseLevelLabel;
+	Slider m_NoiseLevelSlider;
+	std::unique_ptr<SliderAttachment> m_NoiseLevelAttachment;
+
+	Label m_NoiseGraininessLabel;
+	Slider m_NoiseGraininessSlider;
+	std::unique_ptr<SliderAttachment> m_NoiseGraininessAttachment;
+
+	Label m_NoiseColorLowLabel;
+	Slider m_NoiseColorLowSlider;
+	std::unique_ptr<SliderAttachment> m_NoiseColorLowAttachment;
+
+	Label m_NoiseColorHighLabel;
+	Slider m_NoiseColorHighSlider;
+	std::unique_ptr<SliderAttachment> m_NoiseColorHighAttachment;
+
+};
 
 
 

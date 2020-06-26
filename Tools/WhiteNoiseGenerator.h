@@ -46,7 +46,7 @@ protected:
 };
 
 #ifdef USE_JUCE
-
+#include <JuceHeader.h>
 const struct
 {
 	const std::string ID = { "WNLevel_dB" };
@@ -62,10 +62,18 @@ const struct
 	const std::string ID = { "WNGraininess" };
 	std::string name = "Graininess";
 	std::string unitName = "";
-	float minValue = 0.f;
-	float maxValue = 1.f;
-	float defaultValue = 0.f;
+	float minValue = exp(0.2f);
+	float maxValue = exp(1.f);
+	float defaultValue = exp(0.2f);
 }paramNoiseGraininess;
+
+class WhiteNoiseParameter
+{
+public:
+	// Lowpass
+
+	int addParameter(std::vector < std::unique_ptr <RangedAudioParameter>>& paramVector);
+};
 
 
 

@@ -32,3 +32,30 @@ void WhiteNoiseGenerator::setGraininess(double grainFak)
 	}
 	m_normalize = 1.0 / tan(m_grainFactor * M_PI * 0.5);
 }
+
+#ifdef USE_JUCE
+int WhiteNoiseParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParameter>>& paramVector)
+{
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramNoiseLevel.ID,
+		paramNoiseLevel.name,
+		NormalisableRange<float>(paramNoiseLevel.minValue, paramNoiseLevel.maxValue),
+		paramNoiseLevel.defaultValue,
+		paramNoiseLevel.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { value = int((value) * 10) * 0.1;  return String(value, MaxLen); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramNoiseGraininess.ID,
+		paramNoiseGraininess.name,
+		NormalisableRange<float>(paramNoiseGraininess.minValue, paramNoiseGraininess.maxValue),
+		paramNoiseGraininess.defaultValue,
+		paramNoiseGraininess.unitName,
+		AudioProcessorParameter::genericParameter,
+		[](float value, int MaxLen) { value = int(log(value) * 100) * 0.01;  return String(value, MaxLen); },
+		[](const String& text) {return text.getFloatValue(); }));
+
+
+	return 0;
+}
+#endif

@@ -6,6 +6,9 @@
 #include "WavetableOszi.h"
 #include "MoogLadder.h"
 #include "Envelope.h"
+#include "WhiteNoiseGenerator.h"
+#include "ColoredNoiseGenerator.h"
+
 #include "JadeMiniSound.h"
 
 class JadeMiniVoice : public SynthesiserVoice
@@ -132,6 +135,13 @@ private:
     float m_oldmodEnvelope;
     float m_oldmodLfo;
 
-
+// Noise Source
+    std::vector<double> m_noisedata;
+    // Envelope;
+    ColoredNoiseGenerator m_noisegen;
+    float m_oldwhiteLevel;
+    float m_oldwhiteGraininess;
+    float m_oldcoloredLow;
+    float m_oldcoloredHigh;
 };
 

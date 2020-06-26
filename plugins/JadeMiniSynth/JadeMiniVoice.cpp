@@ -56,6 +56,14 @@ JadeMiniVoice::JadeMiniVoice()
 	m_oldenv1Sustain= -1.0;
 	m_oldenv1Release= 0.0;
 
+// noiseGen
+	m_noisegen.setHighpassCutoff(10000.f);
+	m_noisegen.setLowpassCutoff(150.0);
+	
+	m_oldwhiteLevel = -1000.f;
+	m_oldwhiteGraininess = -1.f;
+	m_oldcoloredLow = -1.f;
+	m_oldcoloredHigh = 1.f;
 
 }
 
@@ -265,17 +273,57 @@ void JadeMiniVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int startS
 //		m_filter.setResonance(modLfo);
 		m_oldmodLfo = modLfo;
 	}
+	// noise Generator
+	float whiteLevel = *(m_curSound->m_whiteLevel);
+	if (whiteLevel != m_oldwhiteLevel)
+	{
+		m_noisegen.setLogAmplitude(whiteLevel);
+		//		m_filter.setResonance(modLfo);
+		m_oldwhiteLevel = whiteLevel;
+	}
+	float whitegraininess = log(*(m_curSound->m_whiteGraininess));
+	if (whitegraininess != m_oldwhiteGraininess)
+	{
+		m_noisegen.setGraininess(whitegraininess);
+		//		m_filter.setResonance(modLfo);
+		m_oldwhiteGraininess = whitegraininess;
+	}
 
+	float coloredLow = *(m_curSound->m_coloredLow);
+	if (whitegraininess != m_oldcoloredLow)
+	{
+		m_noisegen.setLowpassOrder(coloredLow);
+		//		m_filter.setResonance(modLfo);
+		m_oldcoloredLow = coloredLow;
+	}
 
+	float coloredHigh = *(m_curSound->m_coloredHigh);
+	if (coloredHigh != m_oldcoloredHigh)
+	{
+		m_noisegen.setHighpassOrder(coloredHigh);
+		//		m_filter.setResonance(modLfo);
+		m_oldcoloredHigh = coloredHigh;
+	}
 
+	// data gen
 	m_data.resize(numSamples);
 	m_osc1.getData(m_data);
+
+	m_noisedata.resize(numSamples);
+	m_noisegen.getData(m_noisedata);
+
+	for (auto kk = 0u ; kk <numSamples ;kk++)
+		m_data[kk] += m_noisedata[kk];
+
+    
 	
-    m_filter.processData(m_data, m_data);
+	m_filter.processData(m_data, m_data);
 
 	m_envdata.resize(numSamples);
 	m_envelope.getData(m_envdata);
 	
+	// noise Source
+
 	auto* channelData = outputBuffer.getArrayOfWritePointers();
 	int counter;
 	for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
@@ -283,7 +331,7 @@ void JadeMiniVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int startS
 		counter = 0;
 		for (auto kk = startSample; kk < startSample + numSamples; ++kk)
 		{
-			channelData[channel][kk] += m_level*m_data[counter] * m_envdata[counter];
+			channelData[channel][kk] += m_level*(m_data[counter]) * m_envdata[counter];
 
 			counter++;
 		}
@@ -306,5 +354,6 @@ void JadeMiniVoice::prepareVoice(double samplerate, int maxBlockLen)
 	m_envdata.resize(m_maxLen);
 	m_envelope.setSamplerate(m_fs);
 	m_filter.setSamplerate(m_fs);
+	m_noisegen.setSamplerate(m_fs);
 
 }
