@@ -70,8 +70,7 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     m_sound->m_cutoff = m_parameterVTS->getRawParameterValue(paramCutoff.ID);
     m_sound->m_reso = m_parameterVTS->getRawParameterValue(paramResonance.ID);
     m_sound->m_modKeyboard = m_parameterVTS->getRawParameterValue(paramModKeyboard.ID);
-    m_sound->m_modEnvelope = m_parameterVTS->getRawParameterValue(paramModEnvelope.ID);
-    m_sound->m_modLfo = m_parameterVTS->getRawParameterValue(paramModLfo.ID);
+    m_sound->m_modDepth = m_parameterVTS->getRawParameterValue(paramModDepth.ID);
 
     // Noise Source
     m_sound->m_whiteLevel = m_parameterVTS->getRawParameterValue(paramNoiseLevel.ID);

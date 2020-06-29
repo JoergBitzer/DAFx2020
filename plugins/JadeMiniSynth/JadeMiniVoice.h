@@ -83,6 +83,7 @@ public:
     void prepareVoice(double samplerate, int maxBlockLen);
 
 private:
+    void resetOldParams();
     static const int m_wavelen = 512;
     int m_maxLen;
     double m_fs;
@@ -132,8 +133,8 @@ private:
 	float m_oldcutoff;
 	float m_oldreso;
     float m_oldmodKeyboard;
-    float m_oldmodEnvelope;
-    float m_oldmodLfo;
+    float m_oldmodDepth;
+
 
 // Noise Source
     std::vector<double> m_noisedata;

@@ -17,6 +17,7 @@ Envelope::Envelope()
 	m_envelopePhase = envelopePhases::Off;
 
 	m_sampleCounter = 0.0;
+	m_maxLevel = 1.0;
 }
 
 Envelope::~Envelope()
@@ -74,7 +75,7 @@ int Envelope::getData(std::vector<double>& data)
 			break;
 
 		}
-		data.at(kk) = m_envGain;
+		data.at(kk) = m_maxLevel*m_envGain;
 	}
 	return 0;
 }
@@ -201,12 +202,22 @@ int EnvelopeParameter::addParameter(std::vector < std::unique_ptr<RangedAudioPar
 			[](float value, int MaxLen) { return (String(0.01 * int((value) * 100.0 + 0.5), MaxLen) + ""); },
 			[](const String& text) {return text.getFloatValue(); }));
 
+		paramVector.push_back(std::make_unique<AudioParameterFloat>(paramEnvLevel.ID[instance],
+			paramEnvLevel.name,
+			NormalisableRange<float>(paramEnvLevel.minValue, paramEnvLevel.maxValue),
+			paramEnvLevel.defaultValue,
+			paramEnvLevel.unitName,
+			AudioProcessorParameter::genericParameter,
+			[](float value, int MaxLen) { return (String(0.1 * int((value) * 10 + 0.5), MaxLen) + ""); },
+			[](const String& text) {return text.getFloatValue(); }));
+
 	}
 	return 0;
 }
 
 EnvelopeParameterComponent::EnvelopeParameterComponent(AudioProcessorValueTreeState& vts, int index, const String& envName)
-	:m_vts(vts), somethingChanged(nullptr), m_name(envName), m_index(index),m_style(EnvelopeStyle::horizontal), m_showdelay(false)
+	:m_vts(vts), somethingChanged(nullptr), m_name(envName), m_index(index),
+	m_style(EnvelopeStyle::horizontal), m_showdelay(false),m_showlevel(false)
 {
 
 	m_EnvDelayLabel.setText("Delay", NotificationType::dontSendNotification);
@@ -269,6 +280,17 @@ EnvelopeParameterComponent::EnvelopeParameterComponent(AudioProcessorValueTreeSt
 	addAndMakeVisible(m_EnvReleaseSlider);
 	m_EnvReleaseSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
 
+	m_EnvLevelLabel.setText("Level", NotificationType::dontSendNotification);
+	m_EnvLevelLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_EnvLevelLabel);
+
+	m_EnvLevelSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_EnvLevelSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+	m_EnvLevelAttachment = std::make_unique<SliderAttachment>(m_vts, paramEnvLevel.ID[m_index], m_EnvLevelSlider);
+	addAndMakeVisible(m_EnvLevelSlider);
+	m_EnvLevelSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+
 }
 
 void EnvelopeParameterComponent::paint(Graphics& g)
@@ -309,7 +331,12 @@ void EnvelopeParameterComponent::resized()
 		m_EnvSustainLabel.setBounds(s.removeFromLeft(ENV_LABEL_WIDTH));
 		s.removeFromLeft(ENV_MIN_DISTANCE);
 		m_EnvReleaseLabel.setBounds(s.removeFromLeft(ENV_LABEL_WIDTH));
+		if (m_showlevel)
+		{
+			s.removeFromLeft(ENV_MIN_DISTANCE);
+			m_EnvLevelLabel.setBounds(s.removeFromLeft(ENV_LABEL_WIDTH));
 
+		}
 		s = r;
 		t = s.removeFromBottom(ENV_ROTARY_WIDTH);
 		if (m_showdelay)
@@ -326,6 +353,11 @@ void EnvelopeParameterComponent::resized()
 		m_EnvSustainSlider.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH));
 		t.removeFromLeft(ENV_MIN_DISTANCE);
 		m_EnvReleaseSlider.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH));
+		if (m_showlevel)
+		{
+			s.removeFromLeft(ENV_MIN_DISTANCE);
+			m_EnvLevelSlider.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH));
+		}
 
 		break;
 	case EnvelopeStyle::vertical:

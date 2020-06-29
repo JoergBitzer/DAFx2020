@@ -6,10 +6,14 @@ MoogLadder::MoogLadder()
 	m_resonance(0.f),
 	m_modKeyboard(1.0),
 	m_modKeyboardFactor(1.0),
-	m_currNote(1)
+	m_currNote(1),
+	m_modDepth(0.0),
+	m_modUpdateRate_ms(1.0),
+	m_modVal(0.0)
 {
 	reset();
 	changeParameter();
+	setUpdate();
 }
 
 MoogLadder::~MoogLadder()
@@ -20,6 +24,18 @@ int MoogLadder::processData(std::vector<double>& in, std::vector<double>& out)
 {
 	for (auto kk = 0U; kk < in.size(); ++kk)
 	{
+		// Modulation update
+		if (m_modUpdateCounter == m_modUpdateRate_samples)
+		{
+			m_modUpdateCounter = 0;
+			m_modVal = m_modData[kk];
+			//double NewCutoff = checkRange(m_cutoff + m_fs/2*0.9*m_modDepth*m_modVal );
+			//setCutoffFrequency(NewCutoff);
+			changeParameter();
+		}
+		++m_modUpdateCounter;
+		
+		// processing
 		double curIn = in[kk];
 		double u = m_alpha_0 * (curIn - m_resonance * (m_state1 * m_beta1 +
 			m_state2 * m_beta2 + m_state3 * m_beta3 + m_state4 * m_beta4));
@@ -67,7 +83,7 @@ void MoogLadder::reset()
 void MoogLadder::changeParameter()
 
 {
-	double cutoff = checkRange(m_cutoff * m_modKeyboardFactor);
+	double cutoff = checkRange(m_modKeyboardFactor * m_cutoff + m_fs / 2 * 0.9 * m_modDepth * m_modVal);
 	double g = tan(M_PI * cutoff / m_fs);
 	m_alpha = g / (1.0 + g);
 	m_alpha_0 = 1.0 / (1.0 + m_resonance * m_alpha * m_alpha * m_alpha * m_alpha);
@@ -107,24 +123,15 @@ int MoogLadderParameter::addParameter(std::vector<std::unique_ptr<RangedAudioPar
 		[](float value, int MaxLen) {return String(value, MaxLen); },
 		[](const String& text) { return text.getFloatValue(); }));
 
-	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramModEnvelope.ID,
-		paramModEnvelope.name,
-		NormalisableRange<float>(paramModEnvelope.minValue, paramModEnvelope.maxValue),
-		paramModEnvelope.defaultValue,
-		paramModEnvelope.unitName,
+	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramModDepth.ID,
+		paramModDepth.name,
+		NormalisableRange<float>(paramModDepth.minValue, paramModDepth.maxValue),
+		paramModDepth.defaultValue,
+		paramModDepth.unitName,
 		AudioProcessorParameter::genericParameter,
 		[](float value, int MaxLen) {return String(value, MaxLen); },
 		[](const String& text) { return text.getFloatValue(); }));
 	
-	paramVector.push_back(std::make_unique<AudioParameterFloat>(paramModLfo.ID,
-		paramModLfo.name,
-		NormalisableRange<float>(paramModLfo.minValue, paramModLfo.maxValue),
-		paramModLfo.defaultValue,
-		paramModLfo.unitName,
-		AudioProcessorParameter::genericParameter,
-		[](float value, int MaxLen) {return String(value, MaxLen); },
-		[](const String& text) { return text.getFloatValue(); }));
-
 	return 0;
 }
 
@@ -162,6 +169,17 @@ MoogLadderParameterComponent::MoogLadderParameterComponent(AudioProcessorValueTr
 	addAndMakeVisible(m_ModKeyboardSlider);
 	m_ModKeyboardSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
 
+
+	m_ModDepthLabel.setText("Depth", NotificationType::dontSendNotification);
+	m_ModDepthLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_ModDepthLabel);
+
+	m_ModDepthSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_ModDepthSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+	m_ModDepthAttachment = std::make_unique<SliderAttachment>(m_vts, paramModDepth.ID, m_ModDepthSlider);
+	addAndMakeVisible(m_ModDepthSlider);
+	m_ModDepthSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
 }
 
 void MoogLadderParameterComponent::paint(Graphics& g)
@@ -192,6 +210,8 @@ void MoogLadderParameterComponent::resized()
 		m_ResonanceLabel.setBounds(s.removeFromLeft(MOOG_LABEL_WIDTH));
 		s.removeFromLeft(MOOG_MIN_DISTANCE);
 		m_ModKeyboardLabel.setBounds(s.removeFromLeft(MOOG_LABEL_WIDTH));
+		s.removeFromLeft(MOOG_MIN_DISTANCE);
+		m_ModDepthLabel.setBounds(s.removeFromLeft(MOOG_LABEL_WIDTH));
 
 		s = r;
 		t = s.removeFromBottom(MOOG_ROTARY_WIDTH);
@@ -200,6 +220,8 @@ void MoogLadderParameterComponent::resized()
 		m_ResonanceSlider.setBounds(t.removeFromLeft(MOOG_ROTARY_WIDTH));
 		t.removeFromLeft(MOOG_MIN_DISTANCE);
 		m_ModKeyboardSlider.setBounds(t.removeFromLeft(MOOG_ROTARY_WIDTH));
+		t.removeFromLeft(MOOG_MIN_DISTANCE);
+		m_ModDepthSlider.setBounds(t.removeFromLeft(MOOG_ROTARY_WIDTH));
 
 		break;
 	case ComponentStyle::vertical:

@@ -13,13 +13,16 @@ public:
 	int processData(std::vector<double>& in, std::vector<double>& out);
 	void setResonance(double resonance) { m_resonance = resonance; changeParameter(); };
 	void setCutoffFrequency(double cutoff) { m_cutoff = cutoff; changeParameter(); };
-	void setSamplerate(double samplerate) { m_fs = samplerate; changeParameter(); };
+	void setSamplerate(double samplerate) { m_fs = samplerate; changeParameter(); setUpdate(); };
 	void setKeyboardModulation(double modValue) { m_modKeyboard = modValue; setMidiNote(m_currNote); };
 	void setMidiNote(int midinote);
 
 	void reset();
-
-
+	
+	// Modulation interface
+	void setUpdateRate(double updaterate_ms) { m_modUpdateRate_ms = updaterate_ms; setUpdate(); }
+	void setModData(std::vector<double>& data) { m_modData = data; };
+	void setModDepth(double modDepth) { m_modDepth = modDepth; };
 private:
 	double m_fs;
 	double m_cutoff;
@@ -44,6 +47,16 @@ private:
 			return 0.9 * m_fs / 2;
 		return value;
 	}
+
+	// time variant modulation LFo and Envelope
+	double m_modUpdateRate_ms;
+	int m_modUpdateRate_samples;
+	int m_modUpdateCounter;
+	void setUpdate() { m_modUpdateRate_samples = m_modUpdateRate_ms * 0.001 * m_fs; m_modUpdateCounter = 0; };
+	std::vector<double> m_modData;
+	double m_modDepth;
+	double m_modVal;
+
 };
 
 #ifdef USE_JUCE
@@ -80,23 +93,13 @@ const struct
 
 const struct
 {
-	std::string ID = "EnvelopeMod";
-	std::string name = "Modulation Envelope";
+	std::string ID = "ModDepth";
+	std::string name = "ModulationDepth";
 	std::string unitName = "";
-	float minValue = -1.0f;
-	float maxValue = 1.f;
-	float defaultValue = 1.f;
-}paramModEnvelope;
-
-const struct
-{
-	std::string ID = "LfoMod";
-	std::string name = "Modulation LFO";
-	std::string unitName = "";
-	float minValue = -1.0f;
-	float maxValue = 1.f;
-	float defaultValue = 1.f;
-}paramModLfo;
+	float minValue = -90.f;
+	float maxValue = 0.f;
+	float defaultValue = -90.f;
+}paramModDepth;
 
 
 class MoogLadderParameter
@@ -143,6 +146,10 @@ private:
 	Label m_ModKeyboardLabel;
 	Slider m_ModKeyboardSlider;
 	std::unique_ptr<SliderAttachment> m_ModKeyboardAttachment;
+
+	Label m_ModDepthLabel;
+	Slider m_ModDepthSlider;
+	std::unique_ptr<SliderAttachment> m_ModDepthAttachment;
 
 };
 

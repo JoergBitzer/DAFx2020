@@ -44,8 +44,7 @@ public:
 	std::atomic<float>* m_cutoff;
 	std::atomic<float>* m_reso;
     std::atomic<float>* m_modKeyboard;
-    std::atomic<float>* m_modEnvelope;
-    std::atomic<float>* m_modLfo;
+    std::atomic<float>* m_modDepth;
 
     // Params for Noise Gen
     std::atomic<float>* m_whiteLevel;

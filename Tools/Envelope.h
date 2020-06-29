@@ -5,10 +5,8 @@ version 1.0 ADSR tested and works fine
 author: Martin Berdau
 (c) BSD 3-clause licence (https://opensource.org/licenses/BSD-3-Clause)
 version 1.1 added parameter and GUI JB 06.2020 
+version 1.2 level parameter JB 28.06.2020
 -----------------------------------------------------------------------------------------*/
-
-// Aufgabe: Erweiterung auf Extended ADSR
-// Delay und Hold als Phasen einbauen. -> Angaben in Zeit -> Samples zählen
 
 #pragma once
 
@@ -41,6 +39,7 @@ public:
 	void setDecayRate(double dec_ms);
 	void setSustainLevel(double level);
 	void setReleaseRate(double rel_ms);
+	void setMaxLevel(double level) { m_maxLevel = level; };
 	envelopePhases getEnvelopeStatus() { return m_envelopePhase; };
 
 protected:
@@ -69,7 +68,7 @@ protected:
 	double m_envGain;
 
 	int m_sampleCounter;
-
+	double m_maxLevel;
 };
 
 #ifdef USE_JUCE
@@ -78,7 +77,7 @@ protected:
 #define MAX_ENV_INSTANCES 4
 const struct
 {
-	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Delay", "Env2Delay", "Env3Delay", "Env1Delay" };
+	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Delay", "Env2Delay", "Env3Delay", "Env4Delay" };
 	std::string name = "EnvDelay";
 	std::string unitName = "ms";
 	float minValue = 0.f;
@@ -88,7 +87,7 @@ const struct
 
 const struct
 {
-	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Hold", "Env2Hold", "Env3Hold", "Env1Hold" };
+	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Hold", "Env2Hold", "Env3Hold", "Env4Hold" };
 	std::string name = "EnvHold";
 	std::string unitName = "ms";
 	float minValue = 0.f;
@@ -98,7 +97,7 @@ const struct
 
 const struct
 {
-	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Sustain", "Env2Sustain", "Env3Sustain", "Env1Sustain" };
+	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Sustain", "Env2Sustain", "Env3Sustain", "Env4Sustain" };
 	std::string name = "EnvSustainLevel";
 	std::string unitName = "";
 	float minValue = 0.f;
@@ -109,7 +108,7 @@ const struct
 
 const struct
 {
-	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Attack", "Env2Attack", "Env3Attack", "Env1Attack" };
+	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Attack", "Env2Attack", "Env3Attack", "Env4Attack" };
 	std::string name = "EnvAttack";
 	std::string unitName = "ms";
 	float minValue = log(0.1f);
@@ -119,7 +118,7 @@ const struct
 
 const struct
 {
-	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Decay", "Env2Decay", "Env3Decay", "Env1Decay" };
+	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Decay", "Env2Decay", "Env3Decay", "Env4Decay" };
 	std::string name = "EnvDecay";
 	std::string unitName = "ms";
 	float minValue = log(0.1f);
@@ -129,13 +128,24 @@ const struct
 
 const struct
 {
-	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Release", "Env2Release", "Env3Release", "Env1Release" };
+	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Release", "Env2Release", "Env3Release", "Env4Release" };
 	std::string name = "EnvRelease";
 	std::string unitName = "ms";
 	float minValue = log(0.1f);
 	float maxValue = log(10000.f);
 	float defaultValue = log(50.f);
 }paramEnvRelease;
+
+const struct
+{
+	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Level", "Env2Level", "Env3Level", "Env4Level" };
+	std::string name = "EnvLevel";
+	std::string unitName = "";
+	float minValue = -90.f;
+	float maxValue = 0.f;
+	float defaultValue = 0.f;
+}paramEnvLevel;
+
 
 
 class EnvelopeParameter
@@ -163,12 +173,14 @@ public:
 	std::function<void()> somethingChanged;
 	void setStyle(EnvelopeStyle style) { m_style = style; };
 	void setShowDelay() { m_showdelay = true; };
+	void setShowLevel() { m_showlevel = true; };
 private:
 	AudioProcessorValueTreeState& m_vts;
 	int m_index;
 	String m_name;
 	EnvelopeStyle m_style;
 	bool m_showdelay;
+	bool m_showlevel;
 
 	Label m_EnvAttackLabel;
 	Slider m_EnvAttackSlider;
@@ -193,6 +205,10 @@ private:
 	Label m_EnvReleaseLabel;
 	Slider m_EnvReleaseSlider;
 	std::unique_ptr<SliderAttachment> m_EnvReleaseAttachment;
+
+	Label m_EnvLevelLabel;
+	Slider m_EnvLevelSlider;
+	std::unique_ptr<SliderAttachment> m_EnvLevelAttachment;
 
 	
 };

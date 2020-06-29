@@ -35,36 +35,12 @@ JadeMiniVoice::JadeMiniVoice()
 	m_filter.setCutoffFrequency(1000.0);
 	m_filter.setSamplerate(44100.0);
 	m_filter.setResonance(1.0);
-	m_oldcutoff = -1.f;
-	m_oldreso = -1.f;
-	m_oldmodKeyboard = -2.f;
-	m_oldmodEnvelope = -2.f;
-	m_oldmodLfo =-2.f;
-
-	m_oldosc1wave1 = -1.0;
-	m_oldosc1wave2= -1.0;
-	m_oldosc1level= -100.0;
-	m_oldosc1xfade= -1.0;
-	m_oldosc1moddepth= 0.0;
-	m_oldosc1tunecoarse= -1000.0;
-	m_oldosc1tunefine= -100.0;
-
-	m_oldenv1Delay= -1.0;
-	m_oldenv1Attack= 0.0;
-	m_oldenv1Hold= -1.0;
-	m_oldenv1Decay= 0.0;
-	m_oldenv1Sustain= -1.0;
-	m_oldenv1Release= 0.0;
 
 // noiseGen
 	m_noisegen.setHighpassCutoff(10000.f);
 	m_noisegen.setLowpassCutoff(150.0);
 	
-	m_oldwhiteLevel = -1000.f;
-	m_oldwhiteGraininess = -1.f;
-	m_oldcoloredLow = -1.f;
-	m_oldcoloredHigh = 1.f;
-
+	resetOldParams();
 }
 
 JadeMiniVoice::~JadeMiniVoice()
@@ -79,7 +55,7 @@ bool JadeMiniVoice::canPlaySound(SynthesiserSound* sound)
 
 void JadeMiniVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSound* sound, int currentPitchWheelPosition)
 {
-
+	resetOldParams();
 	Envelope::envelopePhases envphase =  m_envelope.getEnvelopeStatus();
 	if (envphase == Envelope::envelopePhases::Off)
 		m_osc1.setPortamentoTime(-1.0);
@@ -260,19 +236,13 @@ void JadeMiniVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int startS
 		m_oldmodKeyboard = modKeyboard;
 	}
 	
-	float modEnvelope = *(m_curSound->m_modEnvelope);
-	if (modEnvelope != m_oldmodEnvelope)
+	float modDepth = pow(10.f,*(m_curSound->m_modDepth)/20.f);
+	if (modDepth != m_oldmodDepth)
 	{
-//		m_filter.setResonance(modEnvelope);
-		m_oldmodEnvelope = modEnvelope;
+		m_filter.setModDepth(modDepth);
+		m_oldmodDepth = modDepth;
 	}
 
-	float modLfo = *(m_curSound->m_modLfo);
-	if (modLfo != m_oldmodLfo)
-	{
-//		m_filter.setResonance(modLfo);
-		m_oldmodLfo = modLfo;
-	}
 	// noise Generator
 	float whiteLevel = *(m_curSound->m_whiteLevel);
 	if (whiteLevel != m_oldwhiteLevel)
@@ -315,14 +285,14 @@ void JadeMiniVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int startS
 	for (auto kk = 0u ; kk <numSamples ;kk++)
 		m_data[kk] += m_noisedata[kk];
 
-    
-	
-	m_filter.processData(m_data, m_data);
 
 	m_envdata.resize(numSamples);
 	m_envelope.getData(m_envdata);
-	
-	// noise Source
+
+	m_filter.setModData(m_envdata); // nur test
+	m_filter.processData(m_data, m_data);
+
+// noise Source
 
 	auto* channelData = outputBuffer.getArrayOfWritePointers();
 	int counter;
@@ -355,5 +325,34 @@ void JadeMiniVoice::prepareVoice(double samplerate, int maxBlockLen)
 	m_envelope.setSamplerate(m_fs);
 	m_filter.setSamplerate(m_fs);
 	m_noisegen.setSamplerate(m_fs);
+
+}
+
+void JadeMiniVoice::resetOldParams()
+{
+	m_oldcutoff = -1.f;
+	m_oldreso = -1.f;
+	m_oldmodKeyboard = -2.f;
+	m_oldmodDepth = -100.f;
+
+	m_oldosc1wave1 = -1.0;
+	m_oldosc1wave2 = -1.0;
+	m_oldosc1level = -100.0;
+	m_oldosc1xfade = -1.0;
+	m_oldosc1moddepth = 0.0;
+	m_oldosc1tunecoarse = -1000.0;
+	m_oldosc1tunefine = -100.0;
+
+	m_oldenv1Delay = -1.0;
+	m_oldenv1Attack = 0.0;
+	m_oldenv1Hold = -1.0;
+	m_oldenv1Decay = 0.0;
+	m_oldenv1Sustain = -1.0;
+	m_oldenv1Release = 0.0;
+
+	m_oldwhiteLevel = -1000.f;
+	m_oldwhiteGraininess = -1.f;
+	m_oldcoloredLow = -1.f;
+	m_oldcoloredHigh = 1.f;
 
 }

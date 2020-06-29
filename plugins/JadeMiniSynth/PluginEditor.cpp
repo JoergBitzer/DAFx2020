@@ -60,7 +60,7 @@ void JadeMiniSynthAudioProcessorEditor::paint (Graphics& g)
 #define PLUGIN_MIN_DISTANCE 5
 
 #define MOOG_HEIGHT_HORZ 90
-#define MOOG_WIDTH_HORZ 195
+#define MOOG_WIDTH_HORZ 250
 
 #define NOISE_HEIGHT_HORZ 90
 #define NOISE_WIDTH_HORZ 250
