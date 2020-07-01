@@ -18,6 +18,7 @@ Envelope::Envelope()
 
 	m_sampleCounter = 0.0;
 	m_maxLevel = 1.0;
+	m_invertOn = false;
 }
 
 Envelope::~Envelope()
@@ -75,7 +76,10 @@ int Envelope::getData(std::vector<double>& data)
 			break;
 
 		}
-		data.at(kk) = m_maxLevel*m_envGain;
+		if (m_invertOn)
+			data.at(kk) = m_maxLevel * (1.0-m_envGain);
+		else
+			data.at(kk) = m_maxLevel*m_envGain;
 	}
 	return 0;
 }
@@ -211,6 +215,10 @@ int EnvelopeParameter::addParameter(std::vector < std::unique_ptr<RangedAudioPar
 			[](float value, int MaxLen) { return (String(0.1 * int((value) * 10 + 0.5), MaxLen) + ""); },
 			[](const String& text) {return text.getFloatValue(); }));
 
+		paramVector.push_back(std::make_unique<AudioParameterBool>(paramEnvInvert.ID[instance],
+			paramEnvInvert.name,
+			paramEnvInvert.defaultValue,
+			paramEnvInvert.unitName));
 	}
 	return 0;
 }
@@ -290,13 +298,23 @@ EnvelopeParameterComponent::EnvelopeParameterComponent(AudioProcessorValueTreeSt
 	addAndMakeVisible(m_EnvLevelSlider);
 	m_EnvLevelSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
 
+	m_EnvInvertLabel.setText("Invert", NotificationType::dontSendNotification);
+	m_EnvInvertLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_EnvInvertLabel);
+
+	m_EnvInvertButton.setButtonText("On");
+	
+	m_EnvInvertButton.setColour(ToggleButton::ColourIds::tickDisabledColourId, Colours::darkgrey);
+	m_EnvInvertButton.setColour(ToggleButton::ColourIds::textColourId, Colours::darkgrey);
+	m_EnvInvertButton.setColour(ToggleButton::ColourIds::tickColourId, Colours::darkgrey);
+
+	m_EnvInvertAttachment = std::make_unique<ButtonAttachment>(m_vts, paramEnvInvert.ID[m_index],m_EnvInvertButton );
+	addAndMakeVisible(m_EnvInvertButton);
 
 }
-
 void EnvelopeParameterComponent::paint(Graphics& g)
 {
-	g.fillAll((getLookAndFeel().findColour(ResizableWindow::backgroundColourId)).darker(0.1));
-
+	g.fillAll((getLookAndFeel().findColour(ResizableWindow::backgroundColourId)).darker(0.2));
 }
 
 #define ENV_LABEL_WIDTH 60
@@ -337,6 +355,14 @@ void EnvelopeParameterComponent::resized()
 			m_EnvLevelLabel.setBounds(s.removeFromLeft(ENV_LABEL_WIDTH));
 
 		}
+
+		if (m_showInvert)
+		{
+			s.removeFromLeft(ENV_MIN_DISTANCE);
+			m_EnvInvertLabel.setBounds(s.removeFromLeft(ENV_LABEL_WIDTH));
+		}
+
+
 		s = r;
 		t = s.removeFromBottom(ENV_ROTARY_WIDTH);
 		if (m_showdelay)
@@ -355,8 +381,13 @@ void EnvelopeParameterComponent::resized()
 		m_EnvReleaseSlider.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH));
 		if (m_showlevel)
 		{
-			s.removeFromLeft(ENV_MIN_DISTANCE);
+			t.removeFromLeft(ENV_MIN_DISTANCE);
 			m_EnvLevelSlider.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH));
+		}
+		if (m_showInvert)
+		{
+			t.removeFromLeft(2*ENV_MIN_DISTANCE);
+			m_EnvInvertButton.setBounds(t.removeFromLeft(ENV_ROTARY_WIDTH).removeFromTop(40));
 		}
 
 		break;

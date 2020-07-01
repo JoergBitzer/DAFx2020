@@ -38,6 +38,27 @@ public:
     std::atomic<float>* m_env1Decay;
     std::atomic<float>* m_env1Sustain;
     std::atomic<float>* m_env1Release;
+    std::atomic<float>* m_env1Level;
+
+    // Parameter for Envelop2
+    std::atomic<float>* m_env2Delay;
+    std::atomic<float>* m_env2Attack;
+    std::atomic<float>* m_env2Hold;
+    std::atomic<float>* m_env2Decay;
+    std::atomic<float>* m_env2Sustain;
+    std::atomic<float>* m_env2Release;
+    std::atomic<float>* m_env2Level;
+    std::atomic<float> * m_env2Invert;
+
+// Parameter for LFO1
+    std::atomic<float>* m_lfo1level;
+    std::atomic<float>* m_lfo1waveform;
+    std::atomic<float>* m_lfo1rate;
+
+    // Parameter for LFO2
+    std::atomic<float>* m_lfo2level;
+    std::atomic<float>* m_lfo2waveform;
+    std::atomic<float>* m_lfo2rate;
 
 
 	// Params for Moog Ladder

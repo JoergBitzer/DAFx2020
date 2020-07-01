@@ -21,6 +21,7 @@
 
 #include "WhiteNoiseGenerator.h"
 #include "ColoredNoiseGenerator.h"
+#include "LFO\LFO.h"
 
 //==============================================================================
 /**
@@ -86,6 +87,11 @@ private:
 
     OscParameter m_oscParam;
     EnvelopeParameter m_envParam;
+    EnvelopeParameter m_env2Param;
+
+    LFOParameter m_lfo1Param;
+    LFOParameter m_lfo2Param;
+
     MoogLadderParameter m_moogParam;
 
     WhiteNoiseParameter m_whitenoiseParam;

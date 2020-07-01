@@ -15,7 +15,10 @@
 JadeMiniSynthAudioProcessorEditor::JadeMiniSynthAudioProcessorEditor(JadeMiniSynthAudioProcessor& p, AudioProcessorValueTreeState& vts, PresetHandler& ph)
     : AudioProcessorEditor(&p), m_processor(p), m_vts(vts), m_presetGUI(ph), m_keyboard(p.m_keyboardState, 
         MidiKeyboardComponent::Orientation::horizontalKeyboard),
-    m_osc1(vts,0,"Osc1"),m_env1(vts,0,"EnvelopeVCA"),m_moogladder(vts),m_noise(vts)
+    m_osc1(vts,0,"Osc1"),m_env1(vts,0,"EnvelopeVCA"),
+    m_moogladder(vts),m_noise(vts), 
+    m_env2(vts, 1, "EnvelopeFilter"),
+    m_lfo1(vts, 0, "LFOFilter")
 {
     ScopedLock sp();
     addAndMakeVisible(m_presetGUI);
@@ -27,15 +30,25 @@ JadeMiniSynthAudioProcessorEditor::JadeMiniSynthAudioProcessorEditor(JadeMiniSyn
     addAndMakeVisible(m_env1);
     m_env1.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
 
+    addAndMakeVisible(m_env2);
+    m_env2.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
+    m_env2.setShowDelay();
+    m_env2.setShowLevel();
+    m_env2.setShowInvert();
+
     addAndMakeVisible(m_moogladder);
     m_moogladder.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
 
     addAndMakeVisible(m_noise);
     m_noise.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
 
+    addAndMakeVisible(m_lfo1);
+    m_lfo1.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
+
+
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (1000, 600);
+    setSize (1200, 600);
 }
 
 JadeMiniSynthAudioProcessorEditor::~JadeMiniSynthAudioProcessorEditor()
@@ -57,6 +70,7 @@ void JadeMiniSynthAudioProcessorEditor::paint (Graphics& g)
 
 #define ENV_HEIGHT_HORZ 90
 #define ENV_WIDTH_HORZ 330
+#define ENV_FULLWIDTH_HORZ 525
 #define PLUGIN_MIN_DISTANCE 5
 
 #define MOOG_HEIGHT_HORZ 90
@@ -64,6 +78,9 @@ void JadeMiniSynthAudioProcessorEditor::paint (Graphics& g)
 
 #define NOISE_HEIGHT_HORZ 90
 #define NOISE_WIDTH_HORZ 250
+
+#define LFO_HEIGHT_HORZ 90
+#define LFO_WIDTH_HORZ 220
 
 
 void JadeMiniSynthAudioProcessorEditor::resized()
@@ -85,8 +102,12 @@ void JadeMiniSynthAudioProcessorEditor::resized()
     m_env1.setBounds(s.removeFromLeft(ENV_WIDTH_HORZ));
 
     m_moogladder.setBounds(r.getWidth() / 2 - MOOG_WIDTH_HORZ / 2, r.getHeight() / 2 - MOOG_HEIGHT_HORZ / 2, MOOG_WIDTH_HORZ, MOOG_HEIGHT_HORZ);
+    m_env2.setBounds(r.getWidth() / 2 - ENV_FULLWIDTH_HORZ / 2, r.getHeight() / 2 + MOOG_HEIGHT_HORZ / 2 + GUI_ELEMENT_MIN_DISTANCE ,ENV_FULLWIDTH_HORZ, ENV_HEIGHT_HORZ);
+    m_lfo1.setBounds(r.getWidth() / 2 - LFO_WIDTH_HORZ / 2, r.getHeight() / 2 + MOOG_HEIGHT_HORZ / 2 + ENV_HEIGHT_HORZ + 2* GUI_ELEMENT_MIN_DISTANCE, LFO_WIDTH_HORZ, LFO_HEIGHT_HORZ);
+
 
     rinner = r;
     m_noise.setBounds((rinner.removeFromBottom(NOISE_HEIGHT_HORZ)).removeFromLeft(NOISE_WIDTH_HORZ));
+
 
 }

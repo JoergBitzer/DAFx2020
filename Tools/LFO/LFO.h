@@ -78,6 +78,17 @@ const struct
 	float defaultValue = log(1.f);
 }paramLFORate;
 
+const struct
+{
+	const std::string ID[MAX_LFO_INSTANCES] = { "LFO1Level", "LFO2Level", "LFO3Level", "LFO4Level" };
+	std::string name = "Level";
+	std::string unitName = "dB";
+	float minValue = -90.f;
+	float maxValue = 0.f;
+	float defaultValue = -90.f;
+}paramLFOLevel;
+
+
 
 class LFOParameter
 {
@@ -112,7 +123,14 @@ private:
 	Label m_lforateLabel;
 	Slider m_lforateSlider;
 	std::unique_ptr<SliderAttachment> m_lforateAttachment;
+	Label m_lfolevelLabel;
+	Slider m_lfolevelSlider;
+	std::unique_ptr<SliderAttachment> m_lfolevelAttachment;
+
+
 	AudioProcessorValueTreeState& m_vts;
 	LFOComponentStyle m_style;
+
+
 };
 #endif

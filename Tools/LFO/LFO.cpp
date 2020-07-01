@@ -164,24 +164,61 @@ int LFOParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParameter>
 			AudioProcessorParameter::genericParameter,
 			[](float value, int MaxLen) { return (String(int(exp(value)*10+0.5)*0.1, MaxLen) + " Hz"); },
 			[](const String& text) {return text.getFloatValue(); }));
+
+		paramVector.push_back(std::make_unique<AudioParameterFloat>(paramLFOLevel.ID[instance],
+			paramLFOLevel.name,
+			NormalisableRange<float>(paramLFOLevel.minValue, paramLFOLevel.maxValue),
+			paramLFOLevel.defaultValue,
+			paramLFOLevel.unitName,
+			AudioProcessorParameter::genericParameter,
+			[](float value, int MaxLen) { return (String(int((value) * 10 + 0.5) * 0.1, MaxLen) + " dB"); },
+			[](const String& text) {return text.getFloatValue(); }));
+
 	}
 	return 0;
 }
+
+#define JADE_MINI_SYNTH 1
 
 LFOParameterComponent::LFOParameterComponent(AudioProcessorValueTreeState &vts, int index, const String& lfoName)
 :m_vts(vts), m_index(index), m_name(lfoName), m_style(LFOComponentStyle::longhorizontal),somethingChanged(nullptr)
 {
 	// Rate
 	m_lforateLabel.setText("Rate",NotificationType::dontSendNotification);
+	m_lforateLabel.setJustificationType(Justification::centred);
+
 	addAndMakeVisible(m_lforateLabel);
 	m_lforateSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+#ifndef JADE_MINI_SYNTH
 	m_lforateSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, true, 80, 20);
+#else	
+	m_lforateSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+#endif
+	
 	m_lforateAttachment = std::make_unique<SliderAttachment>(m_vts, paramLFORate.ID[m_index], m_lforateSlider);
 	addAndMakeVisible(m_lforateSlider);
 	m_lforateSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
 
+	// Level
+	m_lfolevelLabel.setText("Level", NotificationType::dontSendNotification);
+	m_lfolevelLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_lfolevelLabel);
+	m_lfolevelSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+#ifndef JADE_MINI_SYNTH
+	m_lfolevelSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, true, 80, 20);
+#else
+	m_lfolevelSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+#endif
+
+	m_lfolevelAttachment = std::make_unique<SliderAttachment>(m_vts, paramLFOLevel.ID[m_index], m_lfolevelSlider);
+	addAndMakeVisible(m_lfolevelSlider);
+	m_lfolevelSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+
 	// Waveform
 	m_lfowaveformLabel.setText("Waveform", NotificationType::dontSendNotification);
+	m_lfowaveformLabel.setJustificationType(Justification::centred);
+
 	addAndMakeVisible(m_lfowaveformLabel);
 	
 	StringArray WaveformNames(paramLFOWaveform.Choices);
@@ -203,45 +240,71 @@ LFOParameterComponent::LFOParameterComponent(AudioProcessorValueTreeState &vts, 
 
 void LFOParameterComponent::paint(Graphics & g)
 {
+#ifndef JADE_MINI_SYNTH
 	g.fillAll((getLookAndFeel().findColour(ResizableWindow::backgroundColourId)).brighter(0.2));
-
 	g.setColour(Colours::red);
 	auto r = getBounds();
 	g.drawRect(r, 4.0);
-	
+#else
+	g.fillAll((getLookAndFeel().findColour(ResizableWindow::backgroundColourId)).darker(0.2));
+#endif
+
 //	g.setFont(15.0f);
 //	g.drawFittedText(m_name, getLocalBounds().reduced(4.0), Justification::centredTop,1);
 }
 
-#define GUI_MIN_DISTANCE 5
+#define LFO_MIN_DISTANCE 5
 #define ELEMNT_HEIGHT 20
-#define ROTARYSIZE 40
-#define LABEL_WIDTH 60
-#define COMBO_WIDTH 80
+#define LFO_ROTARYSIZE 40
+#define LFO_ROTARY_WIDTH 60
+
+#define LFO_LABEL_WIDTH 60
+#define LFO_LABEL_HEIGHT 20
+
+#define LFO_COMBO_WIDTH 80
 void LFOParameterComponent::resized()
 {
+	auto r = getLocalBounds();
+	r.reduce(LFO_MIN_DISTANCE, LFO_MIN_DISTANCE);
+	auto s = r;
+	auto t = r;
+
 	if (m_style == LFOComponentStyle::compact)
 	{
 		auto r = getBounds();
 		//r.removeFromTop(20);
-		m_lforateLabel.setBounds(GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 10, r.getWidth() / 4, r.getHeight() / 2 - GUI_MIN_DISTANCE);
-		m_lforateSlider.setBounds(r.getWidth() / 4 + GUI_MIN_DISTANCE, GUI_MIN_DISTANCE + 10, 3 * r.getWidth() / 4 - 2 * GUI_MIN_DISTANCE, r.getHeight() / 2 - GUI_MIN_DISTANCE);
-		m_lfowaveformLabel.setBounds(GUI_MIN_DISTANCE, r.getHeight() / 2 + GUI_MIN_DISTANCE, 2 * r.getWidth() / 5, r.getHeight() / 2 - 2 * GUI_MIN_DISTANCE);
-		m_lfowaveformCombo.setBounds(2 * r.getWidth() / 5 + GUI_MIN_DISTANCE, r.getHeight() / 2 + GUI_MIN_DISTANCE, 3 * r.getWidth() / 5 - 2 * GUI_MIN_DISTANCE, r.getHeight() / 2 - 2 * GUI_MIN_DISTANCE);
+		m_lforateLabel.setBounds(LFO_MIN_DISTANCE, LFO_MIN_DISTANCE + 10, r.getWidth() / 4, r.getHeight() / 2 - LFO_MIN_DISTANCE);
+		m_lforateSlider.setBounds(r.getWidth() / 4 + LFO_MIN_DISTANCE, LFO_MIN_DISTANCE + 10, 3 * r.getWidth() / 4 - 2 * LFO_MIN_DISTANCE, r.getHeight() / 2 - LFO_MIN_DISTANCE);
+		m_lfowaveformLabel.setBounds(LFO_MIN_DISTANCE, r.getHeight() / 2 + LFO_MIN_DISTANCE, 2 * r.getWidth() / 5, r.getHeight() / 2 - 2 * LFO_MIN_DISTANCE);
+		m_lfowaveformCombo.setBounds(2 * r.getWidth() / 5 + LFO_MIN_DISTANCE, r.getHeight() / 2 + LFO_MIN_DISTANCE, 3 * r.getWidth() / 5 - 2 * LFO_MIN_DISTANCE, r.getHeight() / 2 - 2 * LFO_MIN_DISTANCE);
 	}
 	if (m_style == LFOComponentStyle::longhorizontal)
 	{
 		auto r = getLocalBounds();
-		r.removeFromLeft(GUI_MIN_DISTANCE);
+		r.removeFromLeft(LFO_MIN_DISTANCE);
 		//m_lforateLabel.setVisible(false);
-		m_lforateLabel.setBounds(r.removeFromLeft(LABEL_WIDTH));
-		r.removeFromLeft(GUI_MIN_DISTANCE);
-		m_lforateSlider.setBounds(r.removeFromLeft(3*ROTARYSIZE));
-		r.removeFromLeft(2*GUI_MIN_DISTANCE);
+		/*m_lforateLabel.setBounds(r.removeFromLeft(LFO_LABEL_WIDTH));
+		r.removeFromLeft(LFO_MIN_DISTANCE);
+		m_lforateSlider.setBounds(r.removeFromLeft(3*LFO_ROTARYSIZE));
+		r.removeFromLeft(2*LFO_MIN_DISTANCE);
 		m_lfowaveformLabel.setBounds(r.removeFromLeft(LABEL_WIDTH));
-		r.removeFromLeft(GUI_MIN_DISTANCE);
-		m_lfowaveformCombo.setBounds(r.removeFromLeft(COMBO_WIDTH));
+		r.removeFromLeft(LFO_MIN_DISTANCE);
+		m_lfowaveformCombo.setBounds(r.removeFromLeft(LFO_COMBO_WIDTH));
+		//*/
+		s = r.removeFromTop(LFO_LABEL_HEIGHT);
+		m_lforateLabel.setBounds(s.removeFromLeft(LFO_LABEL_WIDTH));
+		s.removeFromLeft(LFO_MIN_DISTANCE);
+		m_lfowaveformLabel.setBounds(s.removeFromLeft(LFO_COMBO_WIDTH));
+		s.removeFromLeft(LFO_MIN_DISTANCE);
+		m_lfolevelLabel.setBounds(s.removeFromLeft(LFO_LABEL_WIDTH));
 
+		s = r;
+		t = s.removeFromBottom(LFO_ROTARY_WIDTH);
+		m_lforateSlider.setBounds(t.removeFromLeft(LFO_ROTARY_WIDTH));
+		t.removeFromLeft(LFO_MIN_DISTANCE);
+		m_lfowaveformCombo.setBounds(t.removeFromLeft(LFO_COMBO_WIDTH));
+		t.removeFromLeft(LFO_MIN_DISTANCE);
+		m_lfolevelSlider.setBounds(t.removeFromLeft(LFO_ROTARY_WIDTH));
 	}
 }
 

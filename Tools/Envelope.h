@@ -40,10 +40,14 @@ public:
 	void setSustainLevel(double level);
 	void setReleaseRate(double rel_ms);
 	void setMaxLevel(double level) { m_maxLevel = level; };
+	void setInvertOnOff(bool onoff) {
+		m_invertOn = onoff;
+	};
 	envelopePhases getEnvelopeStatus() { return m_envelopePhase; };
 
 protected:
 	void updateTimeConstants(void);
+	bool m_invertOn;
 	double m_fs;
 
 	double m_delTime_ms;
@@ -146,6 +150,15 @@ const struct
 	float defaultValue = 0.f;
 }paramEnvLevel;
 
+const struct
+{
+	const std::string ID[MAX_ENV_INSTANCES] = { "Env1Invert", "Env2Invert", "Env3Invert", "Env4Invert" };
+	std::string name = "EnvInvert";
+	std::string unitName = "";
+	bool minValue = false;
+	bool maxValue = true;
+	bool defaultValue = false;
+}paramEnvInvert;
 
 
 class EnvelopeParameter
@@ -156,6 +169,7 @@ public:
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboAttachment;
+typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
 class EnvelopeParameterComponent : public Component
 {
@@ -174,6 +188,7 @@ public:
 	void setStyle(EnvelopeStyle style) { m_style = style; };
 	void setShowDelay() { m_showdelay = true; };
 	void setShowLevel() { m_showlevel = true; };
+	void setShowInvert() { m_showInvert = true; };
 private:
 	AudioProcessorValueTreeState& m_vts;
 	int m_index;
@@ -181,6 +196,7 @@ private:
 	EnvelopeStyle m_style;
 	bool m_showdelay;
 	bool m_showlevel;
+	bool m_showInvert;
 
 	Label m_EnvAttackLabel;
 	Slider m_EnvAttackSlider;
@@ -209,6 +225,10 @@ private:
 	Label m_EnvLevelLabel;
 	Slider m_EnvLevelSlider;
 	std::unique_ptr<SliderAttachment> m_EnvLevelAttachment;
+
+	Label m_EnvInvertLabel;
+	ToggleButton m_EnvInvertButton;
+	std::unique_ptr<ButtonAttachment> m_EnvInvertAttachment;
 
 	
 };

@@ -9,6 +9,8 @@
 #include "WhiteNoiseGenerator.h"
 #include "ColoredNoiseGenerator.h"
 
+#include "LFO/LFO.h"
+
 #include "JadeMiniSound.h"
 
 class JadeMiniVoice : public SynthesiserVoice
@@ -126,7 +128,22 @@ private:
     float m_oldenv1Decay;
     float m_oldenv1Sustain;
     float m_oldenv1Release;
-    
+    float m_oldenv1Level;
+
+    // envelope
+    std::vector<double> m_env2data;
+    Envelope m_envelope2;
+
+    // parameter envelope
+    float m_oldenv2Delay;
+    float m_oldenv2Attack;
+    float m_oldenv2Hold;
+    float m_oldenv2Decay;
+    float m_oldenv2Sustain;
+    float m_oldenv2Release;
+    float m_oldenv2Level;
+    float m_oldenv2Invert;
+
 // Filter
 	MoogLadder m_filter;
 
@@ -138,11 +155,25 @@ private:
 
 // Noise Source
     std::vector<double> m_noisedata;
-    // Envelope;
     ColoredNoiseGenerator m_noisegen;
     float m_oldwhiteLevel;
     float m_oldwhiteGraininess;
     float m_oldcoloredLow;
     float m_oldcoloredHigh;
+
+// LFOs
+    LFO m_lfo1;
+    std::vector<double> m_lfo1data;
+    float m_oldlfo1level;
+    float m_oldlfo1waveform;
+    float m_oldlfo1rate;
+
+    LFO m_lfo2;
+    std::vector<double> m_lfo2data;
+    float m_oldlfo2level;
+    float m_oldlfo2waveform;
+    float m_oldlfo2rate;
+
+
 };
 

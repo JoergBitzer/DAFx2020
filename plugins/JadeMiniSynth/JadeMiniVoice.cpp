@@ -1,6 +1,9 @@
 #include "JadeMiniVoice.h"
 #include "JadeMiniSound.h"
 
+// ToDo legato need another solution
+
+
 JadeMiniVoice::JadeMiniVoice()
 	:SynthesiserVoice(),
 	m_isAudioOn(false),
@@ -31,6 +34,18 @@ JadeMiniVoice::JadeMiniVoice()
 	m_envelope.setDecayRate(20.0);
 	m_envelope.setSustainLevel(0.2);
 	m_envelope.setReleaseRate(300.0);
+	m_envelope.setMaxLevel(1.0);
+	m_envelope.setInvertOnOff(false);
+
+	m_envelope2.setDelayTime(0.0);
+	m_envelope2.setAttackRate(5.0);
+	m_envelope2.setHoldTime(0.5);
+	m_envelope2.setDecayRate(20.0);
+	m_envelope2.setSustainLevel(0.2);
+	m_envelope2.setReleaseRate(300.0);
+	m_envelope2.setMaxLevel(1.0);
+	m_envelope2.setInvertOnOff(false);
+
 
 	m_filter.setCutoffFrequency(1000.0);
 	m_filter.setSamplerate(44100.0);
@@ -39,7 +54,24 @@ JadeMiniVoice::JadeMiniVoice()
 // noiseGen
 	m_noisegen.setHighpassCutoff(10000.f);
 	m_noisegen.setLowpassCutoff(150.0);
-	
+
+// Lfo
+	m_lfo1.setMin(0.0);
+	m_lfo1.setMax(0.0000000000000001);
+	m_lfo1.setPhase(0.0);
+	m_lfo1.setLFOFunction(LFO::LFOFunctions::sinus);
+	m_lfo1.setStartphase(0.0);
+	m_lfo1.setFrequency(0.0);
+
+	m_lfo2.setMin(0.0);
+	m_lfo2.setMax(0.0000000000000001);
+	m_lfo2.setPhase(0.0);
+	m_lfo2.setLFOFunction(LFO::LFOFunctions::sinus);
+	m_lfo2.setStartphase(0.0);
+	m_lfo2.setFrequency(0.0);
+
+
+
 	resetOldParams();
 }
 
@@ -76,6 +108,7 @@ void JadeMiniVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSou
 
 	// m_isAudioOn = true;
 	m_envelope.NoteOn();
+	m_envelope2.NoteOn(); // filter envelope // ToDo legato need another solution here
 	float modKeyboard = *(m_curSound->m_modKeyboard);
 	if (modKeyboard != m_oldmodKeyboard)
 	{
@@ -86,6 +119,10 @@ void JadeMiniVoice::startNote(int midiNoteNumber, float velocity, SynthesiserSou
 	m_filter.reset();
 
 	m_level = velocity;
+
+	m_lfo1.reset();
+	m_lfo2.reset();
+
 }
 
 void JadeMiniVoice::stopNote(float velocity, bool allowTailOff)
@@ -94,7 +131,7 @@ void JadeMiniVoice::stopNote(float velocity, bool allowTailOff)
 	//clearCurrentNote(); // EIgentlich erst wenn release zu Ende ist.
 	
 	m_envelope.NoteOff();
-
+	m_envelope2.NoteOff();
 }
 
 void JadeMiniVoice::pitchWheelMoved(int newPitchWheelValue)
@@ -213,6 +250,81 @@ void JadeMiniVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int startS
 		m_envelope.setReleaseRate(env1Release);
 	}
 
+	float env1Level = pow(10.f, *(m_curSound->m_env1Level)/20.f);
+
+	if (env1Level != m_oldenv1Level)
+	{
+		m_oldenv1Level = env1Level;
+		m_envelope.setMaxLevel(env1Level);
+	}
+
+// envelope filter
+	float env2Delay = *(m_curSound->m_env2Delay);
+
+	if (env2Delay != m_oldenv2Delay)
+	{
+		m_oldenv2Delay = env2Delay;
+		m_envelope2.setDelayTime(env2Delay);
+	}
+
+	float env2Hold = *(m_curSound->m_env2Hold);
+
+	if (env2Hold != m_oldenv2Hold)
+	{
+		m_oldenv2Hold = env2Hold;
+		m_envelope2.setHoldTime(env2Hold);
+	}
+
+	float env2Sustain = *(m_curSound->m_env2Sustain);
+
+	if (env2Sustain != m_oldenv2Sustain)
+	{
+		m_oldenv2Sustain = env2Sustain;
+		m_envelope2.setSustainLevel(env2Sustain);
+	}
+
+	float env2Attack = exp(*(m_curSound->m_env2Attack));
+
+	if (env2Attack != m_oldenv2Attack)
+	{
+		m_oldenv2Attack = env2Attack;
+		m_envelope2.setAttackRate(env2Attack);
+	}
+
+	float env2Decay = exp(*(m_curSound->m_env2Decay));
+
+	if (env2Decay != m_oldenv2Decay)
+	{
+		m_oldenv2Decay = env2Decay;
+		m_envelope2.setDecayRate(env2Decay);
+	}
+
+	float env2Release = exp(*(m_curSound->m_env2Release));
+
+	if (env2Release != m_oldenv2Release)
+	{
+		m_oldenv2Release = env2Release;
+		m_envelope2.setReleaseRate(env2Release);
+	}
+
+	float env2Level = pow(10.f, *(m_curSound->m_env2Level) / 20.f);
+
+	if (env2Level != m_oldenv2Level)
+	{
+		m_oldenv2Level = env2Level;
+		m_envelope2.setMaxLevel(env2Level);
+	}
+	float env2Invert = *(m_curSound->m_env2Invert);
+
+	if (env2Invert != m_oldenv2Invert)
+	{
+		m_oldenv2Invert = env2Invert;
+		if (env2Invert > 0.5)
+			m_envelope2.setInvertOnOff(true);
+		else
+			m_envelope2.setInvertOnOff(false);
+
+	}
 
 
 
@@ -274,6 +386,49 @@ void JadeMiniVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int startS
 		//		m_filter.setResonance(modLfo);
 		m_oldcoloredHigh = coloredHigh;
 	}
+	
+	float lfo1waveform = *(m_curSound->m_lfo1waveform);
+	if (lfo1waveform != m_oldlfo1waveform)
+	{
+		m_oldlfo1waveform = lfo1waveform;
+		int index = int(lfo1waveform + 0.5);
+		m_lfo1.setLFOFunction(static_cast <LFO::LFOFunctions> (index));
+	}
+	
+	float lfo1rate = exp(*(m_curSound->m_lfo1rate));
+	if (lfo1rate != m_oldlfo1rate)
+	{
+		m_oldlfo1rate = lfo1rate;
+		m_lfo1.setFrequency(lfo1rate);
+	}
+
+	float lfo1level = pow(10.f, *(m_curSound->m_lfo1level) / 20.f);
+	if (lfo1level != m_oldlfo1level)
+	{
+		m_oldlfo1level = lfo1level;
+		m_lfo1.setMax(lfo1level);
+	}
+	float lfo2waveform = *(m_curSound->m_lfo2waveform);
+	if (lfo2waveform != m_oldlfo2waveform)
+	{
+		m_oldlfo2waveform = lfo2waveform;
+		int index = int(lfo2waveform + 0.5);
+		m_lfo2.setLFOFunction(static_cast <LFO::LFOFunctions> (index));
+	}
+
+	float lfo2rate = exp(*(m_curSound->m_lfo2rate));
+	if (lfo2rate != m_oldlfo2rate)
+	{
+		m_oldlfo2rate = lfo2rate;
+		m_lfo2.setFrequency(lfo2rate);
+	}
+
+	float lfo2level = pow(10.f, *(m_curSound->m_lfo2level) / 20.f);
+	if (lfo2level != m_oldlfo2level)
+	{
+		m_oldlfo2level = lfo2level;
+		m_lfo2.setMax(lfo2level);
+	}
 
 	// data gen
 	m_data.resize(numSamples);
@@ -289,7 +444,19 @@ void JadeMiniVoice::renderNextBlock(AudioBuffer<float>& outputBuffer, int startS
 	m_envdata.resize(numSamples);
 	m_envelope.getData(m_envdata);
 
-	m_filter.setModData(m_envdata); // nur test
+	m_env2data.resize(numSamples);
+	m_envelope2.getData(m_env2data);
+
+	m_lfo1data.resize(numSamples);
+	m_lfo1.getData(m_lfo1data);
+
+	m_lfo2data.resize(numSamples);
+	m_lfo1.getData(m_lfo2data);
+
+	for (auto kk = 0u; kk < numSamples; kk++)
+		m_env2data[kk] += m_lfo1data[kk];
+
+	m_filter.setModData(m_env2data);
 	m_filter.processData(m_data, m_data);
 
 // noise Source
@@ -322,10 +489,13 @@ void JadeMiniVoice::prepareVoice(double samplerate, int maxBlockLen)
 	m_osc1.setSamplerate(m_fs);
 
 	m_envdata.resize(m_maxLen);
+	m_env2data.resize(m_maxLen);
 	m_envelope.setSamplerate(m_fs);
+	m_envelope2.setSamplerate(m_fs);
 	m_filter.setSamplerate(m_fs);
 	m_noisegen.setSamplerate(m_fs);
-
+	m_lfo1.setSamplerate(m_fs);
+	m_lfo2.setSamplerate(m_fs);
 }
 
 void JadeMiniVoice::resetOldParams()
@@ -349,10 +519,29 @@ void JadeMiniVoice::resetOldParams()
 	m_oldenv1Decay = 0.0;
 	m_oldenv1Sustain = -1.0;
 	m_oldenv1Release = 0.0;
+	m_oldenv1Level = -100.0;
+
+	m_oldenv2Delay = -1.0;
+	m_oldenv2Attack = 0.0;
+	m_oldenv2Hold = -1.0;
+	m_oldenv2Decay = 0.0;
+	m_oldenv2Sustain = -1.0;
+	m_oldenv2Release = 0.0;
+	m_oldenv2Level = -100.0;
+	m_oldenv2Invert = -1.f;
+
 
 	m_oldwhiteLevel = -1000.f;
 	m_oldwhiteGraininess = -1.f;
 	m_oldcoloredLow = -1.f;
 	m_oldcoloredHigh = 1.f;
+
+	m_oldlfo1level = -100.f;
+	m_oldlfo1rate = -1.f;
+	m_oldlfo1waveform = -1.f;
+	m_oldlfo2level = -100.f;
+	m_oldlfo2rate = -1.f;
+	m_oldlfo2waveform = -1.f;
+
 
 }

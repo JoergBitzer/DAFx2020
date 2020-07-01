@@ -27,6 +27,12 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     // Add Parameters (direct or by calling the addparameter functions)
     m_oscParam.addParameter(m_paramVector, 0);
     m_envParam.addParameter(m_paramVector, 0);
+    m_env2Param.addParameter(m_paramVector, 1);
+
+    m_lfo1Param.addParameter(m_paramVector, 0);
+    m_lfo2Param.addParameter(m_paramVector, 1);
+
+
     m_moogParam.addParameter(m_paramVector);
 
     m_whitenoiseParam.addParameter(m_paramVector);
@@ -59,13 +65,35 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     m_sound->m_osc1tunefine = m_parameterVTS->getRawParameterValue(paramOscTuneFine.ID[0]);
 
     // ENvelope 1 (VCA)
-    m_sound->m_env1Delay = m_parameterVTS->getRawParameterValue(paramEnvDelay.ID[0]);
-    m_sound->m_env1Attack = m_parameterVTS->getRawParameterValue(paramEnvAttack.ID[0]);
-    m_sound->m_env1Hold = m_parameterVTS->getRawParameterValue(paramEnvHold.ID[0]);
-    m_sound->m_env1Decay = m_parameterVTS->getRawParameterValue(paramEnvDecay.ID[0]);
-    m_sound->m_env1Sustain = m_parameterVTS->getRawParameterValue(paramEnvSustain.ID[0]);
-    m_sound->m_env1Release = m_parameterVTS->getRawParameterValue(paramEnvRelease.ID[0]);
+    int envnr = 0;
+    m_sound->m_env1Delay = m_parameterVTS->getRawParameterValue(paramEnvDelay.ID[envnr]);
+    m_sound->m_env1Attack = m_parameterVTS->getRawParameterValue(paramEnvAttack.ID[envnr]);
+    m_sound->m_env1Hold = m_parameterVTS->getRawParameterValue(paramEnvHold.ID[envnr]);
+    m_sound->m_env1Decay = m_parameterVTS->getRawParameterValue(paramEnvDecay.ID[envnr]);
+    m_sound->m_env1Sustain = m_parameterVTS->getRawParameterValue(paramEnvSustain.ID[envnr]);
+    m_sound->m_env1Release = m_parameterVTS->getRawParameterValue(paramEnvRelease.ID[envnr]);
+    m_sound->m_env1Level = m_parameterVTS->getRawParameterValue(paramEnvLevel.ID[envnr]);
+    
+    envnr = 1;
+    // ENvelope 2 (Filter Cutoff)
+    m_sound->m_env2Delay = m_parameterVTS->getRawParameterValue(paramEnvDelay.ID[envnr]);
+    m_sound->m_env2Attack = m_parameterVTS->getRawParameterValue(paramEnvAttack.ID[envnr]);
+    m_sound->m_env2Hold = m_parameterVTS->getRawParameterValue(paramEnvHold.ID[envnr]);
+    m_sound->m_env2Decay = m_parameterVTS->getRawParameterValue(paramEnvDecay.ID[envnr]);
+    m_sound->m_env2Sustain = m_parameterVTS->getRawParameterValue(paramEnvSustain.ID[envnr]);
+    m_sound->m_env2Release = m_parameterVTS->getRawParameterValue(paramEnvRelease.ID[envnr]);
+    m_sound->m_env2Level = m_parameterVTS->getRawParameterValue(paramEnvLevel.ID[envnr]);
+    m_sound->m_env2Invert = m_parameterVTS->getRawParameterValue(paramEnvInvert.ID[envnr]);
 
+    int lfonr = 0;
+    m_sound->m_lfo1level = m_parameterVTS->getRawParameterValue(paramLFOLevel.ID[lfonr]);
+    m_sound->m_lfo1rate = m_parameterVTS->getRawParameterValue(paramLFORate.ID[lfonr]);
+    m_sound->m_lfo1waveform = m_parameterVTS->getRawParameterValue(paramLFOWaveform.ID[lfonr]);
+    lfonr = 1;
+    m_sound->m_lfo2level = m_parameterVTS->getRawParameterValue(paramLFOLevel.ID[lfonr]);
+    m_sound->m_lfo2rate = m_parameterVTS->getRawParameterValue(paramLFORate.ID[lfonr]);
+    m_sound->m_lfo2waveform = m_parameterVTS->getRawParameterValue(paramLFOWaveform.ID[lfonr]);
+    
     // Filter
     m_sound->m_cutoff = m_parameterVTS->getRawParameterValue(paramCutoff.ID);
     m_sound->m_reso = m_parameterVTS->getRawParameterValue(paramResonance.ID);
@@ -78,7 +106,7 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     m_sound->m_coloredLow = m_parameterVTS->getRawParameterValue(paramNoiseColorLow.ID);
     m_sound->m_coloredHigh = m_parameterVTS->getRawParameterValue(paramNoiseColorHigh.ID);
 
-
+    
 }
 
 JadeMiniSynthAudioProcessor::~JadeMiniSynthAudioProcessor()

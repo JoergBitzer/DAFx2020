@@ -19,6 +19,7 @@
 #include "Envelope.h"
 #include "MoogLadder.h"
 #include "ColoredNoiseGenerator.h"
+#include "LFO/LFO.h"
 //==============================================================================
 /**
 */
@@ -49,8 +50,10 @@ private:
     // Osci
     OscParameterComponent m_osc1;
     EnvelopeParameterComponent m_env1;
+    EnvelopeParameterComponent m_env2;
     MoogLadderParameterComponent m_moogladder;
     ColoredNoiseComponent m_noise;
+    LFOParameterComponent m_lfo1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JadeMiniSynthAudioProcessorEditor)
 };
