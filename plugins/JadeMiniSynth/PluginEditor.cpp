@@ -15,7 +15,7 @@
 JadeMiniSynthAudioProcessorEditor::JadeMiniSynthAudioProcessorEditor(JadeMiniSynthAudioProcessor& p, AudioProcessorValueTreeState& vts, PresetHandler& ph)
     : AudioProcessorEditor(&p), m_processor(p), m_vts(vts), m_presetGUI(ph), m_keyboard(p.m_keyboardState, 
         MidiKeyboardComponent::Orientation::horizontalKeyboard),
-    m_osc1(vts,0,"Osc1"),m_env1(vts,0,"EnvelopeVCA"),
+    m_osc1(vts,0,"Osc1"), m_osc2(vts, 1, "Osc2"), m_env1(vts,0,"EnvelopeVCA"),
     m_moogladder(vts),m_noise(vts), 
     m_env2(vts, 1, "EnvelopeFilter"),
     m_lfo1(vts, 0, "LFOFilter")
@@ -26,6 +26,9 @@ JadeMiniSynthAudioProcessorEditor::JadeMiniSynthAudioProcessorEditor(JadeMiniSyn
 
     addAndMakeVisible(m_osc1);
     m_osc1.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
+    addAndMakeVisible(m_osc2);
+    m_osc2.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
+
 
     addAndMakeVisible(m_env1);
     m_env1.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
@@ -94,6 +97,10 @@ void JadeMiniSynthAudioProcessorEditor::resized()
     auto rinner = r;
     auto s = rinner.removeFromTop(OSC_HEIGHT);
     m_osc1.setBounds(s.removeFromLeft(OSC_WIDTH));
+    rinner.removeFromTop(PLUGIN_MIN_DISTANCE);
+    s = rinner.removeFromTop(OSC_HEIGHT);
+    m_osc2.setBounds(s.removeFromLeft(OSC_WIDTH));
+
 
     rinner = r;
     s = rinner.removeFromTop(ENV_HEIGHT_HORZ);

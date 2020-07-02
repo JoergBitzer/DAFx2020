@@ -25,7 +25,10 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
 #endif
 {
     // Add Parameters (direct or by calling the addparameter functions)
+    m_voiceParam.addParameter(m_paramVector);
+
     m_oscParam.addParameter(m_paramVector, 0);
+    m_oscParam.addParameter(m_paramVector, 1);
     m_envParam.addParameter(m_paramVector, 0);
     m_env2Param.addParameter(m_paramVector, 1);
 
@@ -46,8 +49,9 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     m_presethandler.setAudioValueTreeState(m_parameterVTS.get());
     m_presethandler.loadAllUserPresets();
 
-    for (auto kk = 0; kk < kNumberOfVoices; ++kk)
-        //for (auto kk = 0; kk < 1; ++kk)
+    m_NumberOfVoices = 8;
+    m_oldNumberOfVoices = 8;
+    for (auto kk = 0; kk < m_NumberOfVoices; ++kk)
     {
         m_synth.addVoice(new JadeMiniVoice());
     }
@@ -55,14 +59,29 @@ JadeMiniSynthAudioProcessor::JadeMiniSynthAudioProcessor()
     //m_synth.addSound(*m_pSound);
     m_synth.addSound(m_sound);
 
-    // Osc1 
-    m_sound->m_osc1wave1 = m_parameterVTS->getRawParameterValue(paramOscWaveform1.ID[0]);
-    m_sound->m_osc1wave2 = m_parameterVTS->getRawParameterValue(paramOscWaveform2.ID[0]);
-    m_sound->m_osc1moddepth = m_parameterVTS->getRawParameterValue(paramOscModDepth.ID[0]);
-    m_sound->m_osc1xfade = m_parameterVTS->getRawParameterValue(paramOscXFade.ID[0]);
-    m_sound->m_osc1level = m_parameterVTS->getRawParameterValue(paramOscLevel.ID[0]);
-    m_sound->m_osc1tunecoarse = m_parameterVTS->getRawParameterValue(paramOscTuneCoarse.ID[0]);
-    m_sound->m_osc1tunefine = m_parameterVTS->getRawParameterValue(paramOscTuneFine.ID[0]);
+    // Global
+    m_sound->m_voiceNrOfVoices = m_parameterVTS->getRawParameterValue(paramGlobalNrOfVoices.ID);
+    m_sound->m_voicePortamentoTime = m_parameterVTS->getRawParameterValue(paramGlobalPortamentoTime.ID);
+    m_sound->m_voiceTuneA0 = m_parameterVTS->getRawParameterValue(paramGlobalTuneA0.ID);
+
+    // Osc1
+    int oscnr = 0;
+    m_sound->m_osc1wave1 = m_parameterVTS->getRawParameterValue(paramOscWaveform1.ID[oscnr]);
+    m_sound->m_osc1wave2 = m_parameterVTS->getRawParameterValue(paramOscWaveform2.ID[oscnr]);
+    m_sound->m_osc1moddepth = m_parameterVTS->getRawParameterValue(paramOscModDepth.ID[oscnr]);
+    m_sound->m_osc1xfade = m_parameterVTS->getRawParameterValue(paramOscXFade.ID[oscnr]);
+    m_sound->m_osc1level = m_parameterVTS->getRawParameterValue(paramOscLevel.ID[oscnr]);
+    m_sound->m_osc1tunecoarse = m_parameterVTS->getRawParameterValue(paramOscTuneCoarse.ID[oscnr]);
+    m_sound->m_osc1tunefine = m_parameterVTS->getRawParameterValue(paramOscTuneFine.ID[oscnr]);
+
+    oscnr = 1;
+    m_sound->m_osc2wave1 = m_parameterVTS->getRawParameterValue(paramOscWaveform1.ID[oscnr]);
+    m_sound->m_osc2wave2 = m_parameterVTS->getRawParameterValue(paramOscWaveform2.ID[oscnr]);
+    m_sound->m_osc2moddepth = m_parameterVTS->getRawParameterValue(paramOscModDepth.ID[oscnr]);
+    m_sound->m_osc2xfade = m_parameterVTS->getRawParameterValue(paramOscXFade.ID[oscnr]);
+    m_sound->m_osc2level = m_parameterVTS->getRawParameterValue(paramOscLevel.ID[oscnr]);
+    m_sound->m_osc2tunecoarse = m_parameterVTS->getRawParameterValue(paramOscTuneCoarse.ID[oscnr]);
+    m_sound->m_osc2tunefine = m_parameterVTS->getRawParameterValue(paramOscTuneFine.ID[oscnr]);
 
     // ENvelope 1 (VCA)
     int envnr = 0;
@@ -183,7 +202,9 @@ void JadeMiniSynthAudioProcessor::prepareToPlay (double sampleRate, int samplesP
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    m_synth.prepareToPlay(sampleRate, samplesPerBlock);
+    m_fs = sampleRate;
+    m_maxMaxBlockSize = samplesPerBlock;
+    m_synth.prepareToPlay(m_fs, m_maxMaxBlockSize);
 
 }
 
@@ -231,6 +252,22 @@ void JadeMiniSynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, Midi
 
     if (getBusCount(false) < 1)
         return;
+
+    int nrofvoices = *(m_sound->m_voiceNrOfVoices);
+    
+    if (nrofvoices != m_oldNumberOfVoices)
+    {
+        m_NumberOfVoices = nrofvoices;
+        m_oldNumberOfVoices = nrofvoices;
+        m_synth.clearVoices();
+        for (auto kk = 0; kk < m_NumberOfVoices; ++kk)
+        {
+            m_synth.addVoice(new JadeMiniVoice());
+        }
+        m_synth.prepareToPlay(m_fs, m_maxMaxBlockSize);
+
+    }
+
 
     ScopedNoDenormals noDenormals;
     m_synth.renderNextBlock(buffer, midiMessages, 0, nrofsamples);

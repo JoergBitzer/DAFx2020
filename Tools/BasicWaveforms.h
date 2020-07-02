@@ -12,6 +12,7 @@ version 1.1 extended to rectPulse by A. Schiller (TGM student)
 
 #include <cmath>
 #include <vector>
+#include "WhiteNoiseGenerator.h"
 
 class BasicWaveforms
 {
@@ -22,12 +23,15 @@ public:
 		saw,
 		tri,
 		rectPulse,
+		rectPWM,
+		noise,
 		nrofwaveforms
 	};
 
 	BasicWaveforms(int lenWavetable, double maxFreq, double tablef0);
-	void getWavetable(std::vector<double>& wavetable, waveforms waveform);
+	void getWavetable(std::vector<double>& wavetable, waveforms waveform, int addParam = -1);
 	void setDutyCycle(double durtyCicle);
+	void setSeed(int seed) { m_wng.setSeed(seed); };
 
 private:
 	double m_maxFreq;
@@ -37,10 +41,12 @@ private:
 	void computeRect();
 	void computeSaw();
 	void computeTriangle();
-
+	void computeNoise(int seed);
+	void computeRectPWM(int DutyCycle_percent);
 	double m_dutyCycle;
 	void computeRectPulse();
 
 	std::vector<double> m_waveform;
+	WhiteNoiseGenerator m_wng;
 };
 

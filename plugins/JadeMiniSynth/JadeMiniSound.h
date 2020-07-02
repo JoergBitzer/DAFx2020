@@ -22,6 +22,11 @@ public:
     */
     bool appliesToChannel(int midiChannel) { return true; };
 
+    // global parameter
+    std::atomic<float>* m_voiceTuneA0;
+    std::atomic<float>* m_voiceNrOfVoices;
+    std::atomic<float>* m_voicePortamentoTime;
+
     // Parameter for Osc1
     std::atomic<float>* m_osc1wave1;
     std::atomic<float>* m_osc1wave2;
@@ -30,6 +35,16 @@ public:
     std::atomic<float>* m_osc1moddepth;
     std::atomic<float>* m_osc1tunecoarse;
     std::atomic<float>* m_osc1tunefine;
+
+    // Parameter for Osc2
+    std::atomic<float>* m_osc2wave1;
+    std::atomic<float>* m_osc2wave2;
+    std::atomic<float>* m_osc2level;
+    std::atomic<float>* m_osc2xfade;
+    std::atomic<float>* m_osc2moddepth;
+    std::atomic<float>* m_osc2tunecoarse;
+    std::atomic<float>* m_osc2tunefine;
+
 
     // Parameter for Envelop1
     std::atomic<float>* m_env1Delay;

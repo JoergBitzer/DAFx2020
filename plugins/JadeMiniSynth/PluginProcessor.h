@@ -22,6 +22,7 @@
 #include "WhiteNoiseGenerator.h"
 #include "ColoredNoiseGenerator.h"
 #include "LFO\LFO.h"
+#include "VoiceParameter.h"
 
 //==============================================================================
 /**
@@ -77,7 +78,8 @@ private:
     CriticalSection objectLock;
 
     // Synth Voice Sound
-    static const int kNumberOfVoices = 16;
+    int m_NumberOfVoices;
+    int m_oldNumberOfVoices;
     JadeMiniSynth m_synth;
     JadeMiniSound* m_sound;
 
@@ -86,6 +88,8 @@ private:
     // parameter of the different modules
 
     OscParameter m_oscParam;
+    OscParameter m_osc2Param;
+
     EnvelopeParameter m_envParam;
     EnvelopeParameter m_env2Param;
 
@@ -96,7 +100,10 @@ private:
 
     WhiteNoiseParameter m_whitenoiseParam;
     ColoredNoiseParameter m_colorednoiseParam;
+    VoiceParameter m_voiceParam;
 
+    double m_fs;
+    int m_maxMaxBlockSize;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JadeMiniSynthAudioProcessor)

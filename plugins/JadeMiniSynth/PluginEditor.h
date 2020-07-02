@@ -49,6 +49,7 @@ private:
     // GUI Elements
     // Osci
     OscParameterComponent m_osc1;
+    OscParameterComponent m_osc2;
     EnvelopeParameterComponent m_env1;
     EnvelopeParameterComponent m_env2;
     MoogLadderParameterComponent m_moogladder;

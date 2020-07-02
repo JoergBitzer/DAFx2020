@@ -13,6 +13,8 @@
 
 #include "JadeMiniSound.h"
 
+#include "VoiceParameter.h"
+
 class JadeMiniVoice : public SynthesiserVoice
 {
 public:
@@ -106,6 +108,13 @@ private:
     BasicWaveforms m_waveforms;
     WavetableOszi m_osc1;
     std::vector<double> m_data;
+    WavetableOszi m_osc2;
+    std::vector<double> m_data2;
+
+    // Gloabl
+    float m_oldvoiceTuneA0;
+    float m_oldvoicePortamentoTime;
+
 
     // parameter osc1 
     float m_oldosc1wave1;
@@ -115,6 +124,16 @@ private:
     float m_oldosc1moddepth;
     float m_oldosc1tunecoarse;
     float m_oldosc1tunefine;
+
+    // parameter osc2 
+    float m_oldosc2wave1;
+    float m_oldosc2wave2;
+    float m_oldosc2level;
+    float m_oldosc2xfade;
+    float m_oldosc2moddepth;
+    float m_oldosc2tunecoarse;
+    float m_oldosc2tunefine;
+
 
 // envelope
     std::vector<double> m_envdata;
@@ -174,6 +193,7 @@ private:
     float m_oldlfo2waveform;
     float m_oldlfo2rate;
 
+    void updateParameter();
 
 };
 

@@ -7,8 +7,7 @@ WhiteNoiseGenerator::WhiteNoiseGenerator()
 	std::random_device rd;
 	m_mt = std::mt19937(rd());
 	m_dist = std::uniform_real_distribution<double>(-M_PI*0.5, M_PI*0.5);
-	
-
+	m_pureDistribution = false;
 }
 
 WhiteNoiseGenerator::~WhiteNoiseGenerator()
@@ -20,6 +19,18 @@ int WhiteNoiseGenerator::getData(std::vector<double>& data)
 	for (unsigned int kk = 0; kk < data.size(); kk++)
 	{
 		data.at(kk) = getOneWhiteSample();
+	}
+	return 0;
+}
+
+int WhiteNoiseGenerator::getUniformData(std::vector<double>& data, double min, double max)
+{
+	std::uniform_real_distribution<double> dist(min, max);
+
+
+	for (unsigned int kk = 0; kk < data.size(); kk++)
+	{
+		data.at(kk) = dist(m_mt);
 	}
 	return 0;
 }

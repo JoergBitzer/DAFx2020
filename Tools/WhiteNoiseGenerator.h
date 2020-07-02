@@ -18,11 +18,15 @@ public:
 	~WhiteNoiseGenerator();
 
 	virtual int getData(std::vector<double>& data);
+	int getUniformData(std::vector<double>& data, double min = 0.0, double max = 1.0);
 
 	inline double getOneWhiteSample()
 	{
 		double noise = m_dist(m_mt);
-		return (m_normalize * m_amplitude * tan(noise * m_grainFactor));
+		if (m_pureDistribution)
+			return noise;
+		else
+			return (m_normalize * m_amplitude * tan(noise * m_grainFactor));
 	}
 
 	void setAmplitude(double amplitude) {
@@ -43,6 +47,7 @@ protected:
 	double m_amplitude;
 	double m_grainFactor;
 	double m_normalize;
+	bool m_pureDistribution;
 };
 
 #ifdef USE_JUCE

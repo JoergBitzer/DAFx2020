@@ -17,7 +17,8 @@ WavetableOszi::WavetableOszi()
 	m_secondWaveform(0),
 	m_incStepModifier(1.0),
 	m_tunefinal(1.0),
-	m_level(1.0)
+	m_level(1.0),
+	m_portamentoCounter(-1)
 {
 	m_f0Table = m_fsmin / m_lenOfWavetable;
 	double maxAliasingFreeMidiNote = 108.0;
@@ -79,6 +80,10 @@ int WavetableOszi::getData(std::vector<double>& data)
 			--m_portamentoCounter;
 			m_incStep *= m_portamentoFactor;
 		}
+		if (m_portamentoCounter == 0)
+		{
+			--m_portamentoCounter;
+		}
 
 		m_curPos += (m_incStep*m_incStepModifier);
 		if (m_curPos >= m_lenOfWavetable)
@@ -117,10 +122,22 @@ void WavetableOszi::setFrequency(double freq)
 void WavetableOszi::computeIncStep()
 {
 
-	m_incStep = m_freq*m_tunefinal / m_f0Table;
-	m_curWavetable = static_cast<int> (log(m_freq * m_tunefinal / m_f0Table) / log(pow(2.0, double(m_semitonespertable) / 12.0)));
-	if (m_curWavetable < 0)
-		m_curWavetable = 0;
+	if (m_portamentoCounter <= 0)
+	{
+		m_incStep = m_freq * m_tunefinal / m_f0Table;
+		m_curWavetable = static_cast<int> (log(m_freq * m_tunefinal / m_f0Table) / log(pow(2.0, double(m_semitonespertable) / 12.0)));
+		if (m_curWavetable < 0)
+			m_curWavetable = 0;
+	}
+	else
+	{
+		double targetInc = m_freq * m_tunefinal / m_f0Table;
+		m_portamentoFactor = exp(log(targetInc / m_incStep) / m_portamentoCounter);
+		m_curWavetable = static_cast<int> (log(m_freq * m_tunefinal / m_f0Table) / log(pow(2.0, double(m_semitonespertable) / 12.0)));
+		if (m_curWavetable < 0)
+			m_curWavetable = 0;
+
+	}
 }
 void WavetableOszi::computeTuning()
 {
@@ -226,6 +243,7 @@ void WavetableOszi::copyNewWavetable(std::vector<double> newwaveform,int nrWavef
 	}
 }
 
+#ifdef USE_JUCE
 int OscParameter::addParameter(std::vector<std::unique_ptr<RangedAudioParameter>>& paramVector, int instance)
 {
 	if (instance < MAX_OSC_INSTANCES)
@@ -440,3 +458,4 @@ void OscParameterComponent::resized()
 	m_osc1levelSlider.setBounds(s.removeFromRight(OSC_SMALLROTARY_WIDTH));
 	
 }
+#endif
