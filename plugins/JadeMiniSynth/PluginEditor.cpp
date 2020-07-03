@@ -18,7 +18,8 @@ JadeMiniSynthAudioProcessorEditor::JadeMiniSynthAudioProcessorEditor(JadeMiniSyn
     m_osc1(vts,0,"Osc1"), m_osc2(vts, 1, "Osc2"), m_env1(vts,0,"EnvelopeVCA"),
     m_moogladder(vts),m_noise(vts), 
     m_env2(vts, 1, "EnvelopeFilter"),
-    m_lfo1(vts, 0, "LFOFilter")
+    m_lfo1(vts, 0, "LFOFilter"),
+    m_voice(vts)
 {
     ScopedLock sp();
     addAndMakeVisible(m_presetGUI);
@@ -48,10 +49,12 @@ JadeMiniSynthAudioProcessorEditor::JadeMiniSynthAudioProcessorEditor(JadeMiniSyn
     addAndMakeVisible(m_lfo1);
     m_lfo1.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
 
+    addAndMakeVisible(m_voice);
+    m_voice.somethingChanged = [this]() {m_presetGUI.setSomethingChanged(); };
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (1200, 600);
+    setSize (1100, 550);
 }
 
 JadeMiniSynthAudioProcessorEditor::~JadeMiniSynthAudioProcessorEditor()
@@ -85,6 +88,8 @@ void JadeMiniSynthAudioProcessorEditor::paint (Graphics& g)
 #define LFO_HEIGHT_HORZ 90
 #define LFO_WIDTH_HORZ 220
 
+#define VOICE_WIDTH 195
+#define VOICE_HEIGHT 90
 
 void JadeMiniSynthAudioProcessorEditor::resized()
 {
@@ -97,10 +102,15 @@ void JadeMiniSynthAudioProcessorEditor::resized()
     auto rinner = r;
     auto s = rinner.removeFromTop(OSC_HEIGHT);
     m_osc1.setBounds(s.removeFromLeft(OSC_WIDTH));
+    
+  
     rinner.removeFromTop(PLUGIN_MIN_DISTANCE);
     s = rinner.removeFromTop(OSC_HEIGHT);
     m_osc2.setBounds(s.removeFromLeft(OSC_WIDTH));
 
+    rinner = r;
+    s = rinner.removeFromTop(VOICE_HEIGHT);
+    m_voice.setBounds(s.removeFromRight(VOICE_WIDTH));
 
     rinner = r;
     s = rinner.removeFromTop(ENV_HEIGHT_HORZ);

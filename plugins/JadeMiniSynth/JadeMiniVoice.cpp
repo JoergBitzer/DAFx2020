@@ -1,7 +1,6 @@
 #include "JadeMiniVoice.h"
 #include "JadeMiniSound.h"
 
-#include "VoiceParameter.h"
 // ToDo legato needs another solution
 
 
@@ -709,4 +708,86 @@ int VoiceParameter::addParameter(std::vector < std::unique_ptr<RangedAudioParame
 		[](const String& text) { return text.getFloatValue(); }));
 
 	return 0;
+}
+
+VoiceParameterComponent::VoiceParameterComponent(AudioProcessorValueTreeState& vts)
+	:m_vts(vts), somethingChanged(nullptr), m_style(ComponentStyle::horizontal)
+{
+	m_PortamentoTimeLabel.setText("Glide", NotificationType::dontSendNotification);
+	m_PortamentoTimeLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_PortamentoTimeLabel);
+
+	m_PortamentoTimeSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_PortamentoTimeSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+	m_PortamentoTimeAttachment = std::make_unique<SliderAttachment>(m_vts, paramGlobalPortamentoTime.ID, m_PortamentoTimeSlider);
+	addAndMakeVisible(m_PortamentoTimeSlider);
+	m_PortamentoTimeSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_NrOfVoicesLabel.setText("NrOfVoices", NotificationType::dontSendNotification);
+	m_NrOfVoicesLabel.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_NrOfVoicesLabel);
+
+	m_NrOfVoicesSlider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_NrOfVoicesSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+	m_NrOfVoicesAttachment = std::make_unique<SliderAttachment>(m_vts, paramGlobalNrOfVoices.ID, m_NrOfVoicesSlider);
+	addAndMakeVisible(m_NrOfVoicesSlider);
+	m_NrOfVoicesSlider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+	m_GlobalTuneA0Label.setText("TuneA0", NotificationType::dontSendNotification);
+	m_GlobalTuneA0Label.setJustificationType(Justification::centred);
+	addAndMakeVisible(m_GlobalTuneA0Label);
+
+	m_GlobalTuneA0Slider.setSliderStyle(Slider::SliderStyle::Rotary);
+	m_GlobalTuneA0Slider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, true, 60, 20);
+	m_GlobalTuneA0Attachment = std::make_unique<SliderAttachment>(m_vts, paramGlobalTuneA0.ID, m_GlobalTuneA0Slider);
+	addAndMakeVisible(m_GlobalTuneA0Slider);
+	m_GlobalTuneA0Slider.onValueChange = [this]() {if (somethingChanged != nullptr) somethingChanged(); };
+
+}
+
+void VoiceParameterComponent::paint(Graphics& g)
+{
+	g.fillAll((getLookAndFeel().findColour(ResizableWindow::backgroundColourId)).darker(0.2));
+
+}
+
+#define GLOBAL_LABEL_WIDTH 60
+#define GLOBAL_ROTARY_WIDTH 60
+#define GLOBAL_MIN_DISTANCE 5
+#define GLOBAL_LABEL_HEIGHT 20
+
+void VoiceParameterComponent::resized()
+{
+	auto r = getLocalBounds();
+	r.reduce(GLOBAL_MIN_DISTANCE, GLOBAL_MIN_DISTANCE);
+	auto s = r;
+	auto t = r;
+	switch (m_style)
+	{
+	case ComponentStyle::compact:
+
+		break;
+	case ComponentStyle::horizontal:
+		s = r.removeFromTop(GLOBAL_LABEL_HEIGHT);
+		m_NrOfVoicesLabel.setBounds(s.removeFromLeft(GLOBAL_LABEL_WIDTH));
+		s.removeFromLeft(GLOBAL_MIN_DISTANCE);
+		m_GlobalTuneA0Label.setBounds(s.removeFromLeft(GLOBAL_LABEL_WIDTH));
+		s.removeFromLeft(GLOBAL_MIN_DISTANCE);
+		m_PortamentoTimeLabel.setBounds(s.removeFromLeft(GLOBAL_LABEL_WIDTH));
+
+		s = r;
+		t = s.removeFromBottom(GLOBAL_ROTARY_WIDTH);
+		m_NrOfVoicesSlider.setBounds(t.removeFromLeft(GLOBAL_ROTARY_WIDTH));
+		t.removeFromLeft(GLOBAL_MIN_DISTANCE);
+		m_GlobalTuneA0Slider.setBounds(t.removeFromLeft(GLOBAL_ROTARY_WIDTH));
+		t.removeFromLeft(GLOBAL_MIN_DISTANCE);
+		m_PortamentoTimeSlider.setBounds(t.removeFromLeft(GLOBAL_ROTARY_WIDTH));
+
+		break;
+	case ComponentStyle::vertical:
+
+		break;
+	}
+
+
 }

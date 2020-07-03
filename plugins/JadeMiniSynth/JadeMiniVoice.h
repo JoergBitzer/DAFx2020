@@ -13,8 +13,6 @@
 
 #include "JadeMiniSound.h"
 
-#include "VoiceParameter.h"
-
 class JadeMiniVoice : public SynthesiserVoice
 {
 public:
@@ -194,6 +192,88 @@ private:
     float m_oldlfo2rate;
 
     void updateParameter();
+
+};
+
+#pragma once
+
+#include <JuceHeader.h>
+
+const struct
+{
+    std::string ID = "VoiceGlobalTuneA0";
+    std::string name = "Tuning (global)";
+    std::string unitName = " Hz";
+    float minValue = 400.f;
+    float maxValue = 490.f;
+    float defaultValue = 440.f;
+}paramGlobalTuneA0;
+
+const struct
+{
+    std::string ID = "SynthNrOfVoice";
+    std::string name = "Number of Voices";
+    std::string unitName = "";
+    float minValue = 1.f;
+    float maxValue = 32.f;
+    float defaultValue = 8.f;
+}paramGlobalNrOfVoices;
+
+const struct
+{
+    std::string ID = "VoicePortanmentoTime";
+    std::string name = "Portamento";
+    std::string unitName = " ms";
+    float minValue = log(0.1f);
+    float maxValue = log(4000.f);
+    float defaultValue = log(0.1f);
+}paramGlobalPortamentoTime;
+
+
+class VoiceParameter
+{
+public:
+    // Lowpass
+
+    int addParameter(std::vector < std::unique_ptr<RangedAudioParameter>>& paramVector);
+};
+
+
+
+typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboAttachment;
+
+class VoiceParameterComponent : public Component
+{
+public:
+    enum class ComponentStyle
+    {
+        compact,
+        horizontal,
+        vertical
+    };
+    VoiceParameterComponent(AudioProcessorValueTreeState&);
+
+    void paint(Graphics& g) override;
+    void resized() override;
+    std::function<void()> somethingChanged;
+    void setStyle(ComponentStyle style) { m_style = style; };
+
+private:
+    AudioProcessorValueTreeState& m_vts;
+    ComponentStyle m_style;
+
+    Label m_NrOfVoicesLabel;
+    Slider m_NrOfVoicesSlider;
+    std::unique_ptr<SliderAttachment> m_NrOfVoicesAttachment;
+
+    Label m_PortamentoTimeLabel;
+    Slider m_PortamentoTimeSlider;
+    std::unique_ptr<SliderAttachment> m_PortamentoTimeAttachment;
+
+    Label m_GlobalTuneA0Label;
+    Slider m_GlobalTuneA0Slider;
+    std::unique_ptr<SliderAttachment> m_GlobalTuneA0Attachment;
 
 };
 

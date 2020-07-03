@@ -22,7 +22,6 @@
 #include "WhiteNoiseGenerator.h"
 #include "ColoredNoiseGenerator.h"
 #include "LFO\LFO.h"
-#include "VoiceParameter.h"
 
 //==============================================================================
 /**

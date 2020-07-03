@@ -20,6 +20,7 @@
 #include "MoogLadder.h"
 #include "ColoredNoiseGenerator.h"
 #include "LFO/LFO.h"
+#include "JadeMiniVoice.h"
 //==============================================================================
 /**
 */
@@ -55,6 +56,6 @@ private:
     MoogLadderParameterComponent m_moogladder;
     ColoredNoiseComponent m_noise;
     LFOParameterComponent m_lfo1;
-
+    VoiceParameterComponent m_voice;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JadeMiniSynthAudioProcessorEditor)
 };
